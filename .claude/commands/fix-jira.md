@@ -1,9 +1,10 @@
 # Fix Jira Item
 
-You are helping refine and update a Jira ticket with clear requirements and acceptance criteria.
+You are helping refine, clarify, and implement a Jira ticket from the project at https://jhsdc.atlassian.net/browse/
 
-The Jira project base URL is: https://jhsdc.atlassian.net/browse/
 The ticket to work on is: $ARGUMENTS
+
+---
 
 ## Step 1: Fetch the Jira Ticket
 
@@ -12,7 +13,7 @@ First, get the Atlassian cloud ID:
 getAccessibleAtlassianResources()
 ```
 
-Then fetch the ticket using the ticket ID from $ARGUMENTS (strip the URL if a full URL was provided — extract just the ticket key like PROJ-123):
+Then fetch the ticket (strip the base URL if provided — extract just the key like PROJ-123):
 ```
 getJiraIssue(
   cloudId="...",
@@ -33,17 +34,16 @@ Display the current ticket contents clearly:
 ## Step 2: Analyze the Ticket
 
 Read the ticket carefully and identify:
-1. What is the current description saying?
-2. Are requirements clear and actionable?
-3. Is there missing context (who, what, why, edge cases)?
-4. Are acceptance criteria present and testable?
-5. What clarifying questions would help make this ticket implementation-ready?
+1. Are requirements clear and actionable?
+2. Is there missing context (who, what, why, edge cases)?
+3. Are acceptance criteria present and testable?
+4. What clarifying questions would help make this ticket implementation-ready?
 
 ---
 
 ## Step 3: Ask Clarifying Questions
 
-Present a numbered list of clarifying questions based on what's missing or ambiguous. Be specific — reference actual content from the ticket. For example:
+Present a numbered list of clarifying questions based on what's missing or ambiguous. Reference actual content from the ticket. For example:
 
 - "The description mentions X but doesn't specify Y — can you clarify?"
 - "Should this work for logged-out users as well, or only authenticated users?"
@@ -62,23 +62,22 @@ Based on the user's answers, draft updated content and present it to the user fo
 [Rewrite the description with full context, user story format if applicable, and technical notes]
 
 **Proposed Acceptance Criteria:**
-Use a clear checklist format:
 ```
-**Acceptance Criteria:**
-
 - [ ] Given [context], when [action], then [expected result]
 - [ ] Given [context], when [action], then [expected result]
 - [ ] Edge case: [description of edge case behavior]
 - [ ] Error state: [what happens when X fails]
 ```
 
-Ask: "Does this look correct? Should I update the Jira ticket now?"
+Ask: "Does this look correct? Should I update the Jira ticket and begin implementation?"
 
 ---
 
 ## Step 5: Update the Jira Ticket
 
-Once the user confirms, update the ticket:
+Once the user confirms, update the ticket using Atlassian Document Format (ADF). Structure the description as:
+1. Refined requirements section
+2. "Acceptance Criteria" heading followed by a bullet checklist
 
 ```
 editJiraIssue(
@@ -88,43 +87,79 @@ editJiraIssue(
     "description": {
       "type": "doc",
       "version": 1,
-      "content": [
-        {
-          "type": "paragraph",
-          "content": [{ "type": "text", "text": "<updated description with acceptance criteria>" }]
-        }
-      ]
+      "content": [...]
     }
   }
 )
 ```
 
-Format the description as Atlassian Document Format (ADF). Structure it as:
-1. A description section with the refined requirements
-2. A clear "Acceptance Criteria" heading followed by a bullet list of testable criteria
+---
+
+## Step 6: Create a Feature Branch
+
+Create a new git branch from main named after the ticket key (lowercase, hyphenated):
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b <ticket-key-lowercase>
+```
+
+For example, if the ticket is `JHSDC-42`, create branch `jhsdc-42`.
+
+If the ticket summary is descriptive, append a short slug:
+`jhsdc-42-add-cart-persistence`
+
+Confirm the branch was created and show the current branch name.
 
 ---
 
-## Step 6: Confirm Completion
+## Step 7: Implement the Fix or Feature
 
-After updating, display:
+Explore the codebase to understand what needs to change, then implement the work according to the finalized acceptance criteria.
+
+Follow these rules:
+- Read relevant files before editing them
+- Make only the changes needed to satisfy the acceptance criteria — no scope creep
+- Follow existing code patterns and conventions (see CLAUDE.md)
+- Use pnpm as the package manager if dependencies are needed
+- Do NOT commit any changes — leave everything as unstaged working tree changes for the user to review
+
+After implementing, run the build to verify no errors:
+```bash
+pnpm build
 ```
-✅ Ticket updated: <ticket-key>
-https://jhsdc.atlassian.net/browse/<ticket-key>
 
-**What was updated:**
-- Clarified description with [brief summary of changes]
-- Added [N] acceptance criteria
+Fix any build or lint errors before finishing.
 
-**Acceptance Criteria Added:**
-- [list the criteria]
+---
+
+## Step 8: Summary
+
+Display a final summary:
+
+```
+✅ Jira ticket updated and implementation complete
+
+**Ticket:** <ticket-key> — https://jhsdc.atlassian.net/browse/<ticket-key>
+**Branch:** <branch-name>
+
+**Changes made:**
+- [file or area changed]: [brief description]
+- [file or area changed]: [brief description]
+
+**Acceptance Criteria Status:**
+- [ ] [criterion 1]
+- [ ] [criterion 2]
+
+All changes are unstaged. Review with `git diff` then commit when ready.
 ```
 
 ---
 
 ## Notes
 
-- If the ticket already has good acceptance criteria, focus clarifying questions on gaps or edge cases only
-- If $ARGUMENTS is empty, ask the user for the ticket ID before proceeding
-- The Jira project base is https://jhsdc.atlassian.net/browse/ — always construct links using this base
-- Use ADF (Atlassian Document Format) when writing description content to the API
+- If $ARGUMENTS is empty, ask for the ticket ID before proceeding
+- If the ticket already has clear acceptance criteria, skip straight to confirming them before implementation
+- If main is not the default branch, use whatever the repo's default branch is (`git symbolic-ref refs/remotes/origin/HEAD`)
+- Do not commit, push, or create a PR — leave that to the user
