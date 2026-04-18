@@ -73,9 +73,25 @@ Ask: "Does this look correct? Should I update the Jira ticket and begin implemen
 
 ---
 
-## Step 5: Update the Jira Ticket
+## Step 5: Create a Feature Branch
 
-Once the user confirms, update the ticket using Atlassian Document Format (ADF). Structure the description as:
+**Before updating the ticket or touching any code**, create a local branch from main:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b <ticket-key-lowercase>
+```
+
+For example, if the ticket is `VS-3`, create branch `vs-3`. If the ticket summary is descriptive, append a short slug: `vs-3-gtm-support`.
+
+Confirm the branch was created and show the current branch name. **All subsequent work happens on this branch.**
+
+---
+
+## Step 6: Update the Jira Ticket
+
+Once on the branch, update the ticket using Atlassian Document Format (ADF). Structure the description as:
 1. Refined requirements section
 2. "Acceptance Criteria" heading followed by a bullet checklist
 
@@ -92,25 +108,6 @@ editJiraIssue(
   }
 )
 ```
-
----
-
-## Step 6: Create a Feature Branch
-
-Create a new git branch from main named after the ticket key (lowercase, hyphenated):
-
-```bash
-git checkout main
-git pull origin main
-git checkout -b <ticket-key-lowercase>
-```
-
-For example, if the ticket is `JHSDC-42`, create branch `jhsdc-42`.
-
-If the ticket summary is descriptive, append a short slug:
-`jhsdc-42-add-cart-persistence`
-
-Confirm the branch was created and show the current branch name.
 
 ---
 
@@ -134,7 +131,7 @@ Fix any build or lint errors before finishing.
 
 ---
 
-## Step 8: Summary
+## Step 8: Summary (changes are NOT committed)
 
 Display a final summary:
 
