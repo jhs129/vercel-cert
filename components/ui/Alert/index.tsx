@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export type AlertVariant = "breaking" | "warning" | "info";
 
 export interface AlertProps {
@@ -6,68 +8,29 @@ export interface AlertProps {
   message: string;
 }
 
-function WarningIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-      <line x1="12" y1="9" x2="12" y2="13" />
-      <line x1="12" y1="17" x2="12.01" y2="17" />
-    </svg>
-  );
-}
-
-function InfoIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
-    </svg>
-  );
-}
-
-const variantStyles: Record<AlertVariant, { icon: React.ReactNode; badgeBorder: string; iconColor: string }> = {
+const variantStyles: Record<
+  AlertVariant,
+  { iconSrc: string; iconFilter: string; badgeBorder: string }
+> = {
   breaking: {
-    icon: <WarningIcon />,
-    iconColor: "text-white",
+    iconSrc: "/icons/warning.svg",
+    iconFilter: "",
     badgeBorder: "border-white text-white",
   },
   warning: {
-    icon: <WarningIcon />,
-    iconColor: "text-yellow-400",
+    iconSrc: "/icons/warning.svg",
+    iconFilter: "brightness-0 saturate-100 invert-[83%] sepia-[98%] saturate-[1000%] hue-rotate-[5deg]",
     badgeBorder: "border-yellow-400 text-yellow-400",
   },
   info: {
-    icon: <InfoIcon />,
-    iconColor: "text-blue-400",
+    iconSrc: "/icons/info.svg",
+    iconFilter: "brightness-0 saturate-100 invert-[48%] sepia-[98%] saturate-[500%] hue-rotate-[190deg]",
     badgeBorder: "border-blue-400 text-blue-400",
   },
 };
 
 export function Alert({ variant = "breaking", label, message }: AlertProps) {
-  const { icon, iconColor, badgeBorder } = variantStyles[variant];
+  const { iconSrc, iconFilter, badgeBorder } = variantStyles[variant];
 
   return (
     <div
@@ -75,7 +38,14 @@ export function Alert({ variant = "breaking", label, message }: AlertProps) {
       role="alert"
       aria-live="polite"
     >
-      <span className={iconColor}>{icon}</span>
+      <Image
+        src={iconSrc}
+        alt=""
+        width={18}
+        height={18}
+        className={iconFilter}
+        aria-hidden
+      />
       {label && (
         <span
           className={`border font-bold text-xs uppercase tracking-wider px-2 py-0.5 shrink-0 ${badgeBorder}`}
