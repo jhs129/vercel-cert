@@ -130,16 +130,50 @@ Use `--base main` if the base branch is not automatically detected correctly.
 
 ## Step 8: Transition the Jira Ticket (if applicable)
 
-If a Jira ticket was found, transition it to "In Review" or the equivalent status:
+If a Jira ticket was found:
 
+**a) Transition to "In Review":**
 ```
 getTransitionsForJiraIssue(cloudId="...", issueIdOrKey="<ticket-key>")
 ```
-
 Pick the transition that represents "In Review", "In Progress", or "Under Review" — whichever is most appropriate. Then:
-
 ```
 transitionJiraIssue(cloudId="...", issueIdOrKey="<ticket-key>", transitionId="...")
+```
+
+**b) Assign the ticket to the reporter** (use the reporter's accountId from the ticket fetched in Step 2):
+```
+editJiraIssue(
+  cloudId="...",
+  issueIdOrKey="<ticket-key>",
+  fields={ "assignee": { "accountId": "<reporter-account-id>" } }
+)
+```
+
+**c) Add a comment with a clickable PR link** so the reviewer can navigate directly to GitHub. Use ADF format with a `link` mark so the URL is a real hyperlink:
+```
+addCommentToJiraIssue(
+  cloudId="...",
+  issueIdOrKey="<ticket-key>",
+  contentFormat="adf",
+  commentBody={
+    "type": "doc",
+    "version": 1,
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [
+          { "type": "text", "text": "PR ready for review: " },
+          {
+            "type": "text",
+            "text": "<pr-url>",
+            "marks": [{ "type": "link", "attrs": { "href": "<pr-url>" } }]
+          }
+        ]
+      }
+    ]
+  }
+)
 ```
 
 ---
@@ -153,7 +187,7 @@ transitionJiraIssue(cloudId="...", issueIdOrKey="<ticket-key>", transitionId="..
 **Branch:** <branch-name>
 **Version:** <new-version>
 <If Jira:>
-**Jira:** https://jhsdc.atlassian.net/browse/<ticket-key> (transitioned to In Review)
+**Jira:** https://jhsdc.atlassian.net/browse/<ticket-key> (transitioned to In Review, assigned to reporter, PR link added as comment)
 ```
 
 ---
