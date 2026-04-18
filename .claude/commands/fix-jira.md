@@ -89,6 +89,63 @@ Confirm the branch was created and show the current branch name. **All subsequen
 
 ---
 
+## Step 5b: Link the Branch to the Jira Ticket and Transition to In Progress
+
+Run these in parallel after the branch is created:
+
+**a) Get the GitHub repo URL** to construct the branch link:
+```bash
+git remote get-url origin
+```
+Parse the output to get `https://github.com/<owner>/<repo>`. The branch URL is:
+`https://github.com/<owner>/<repo>/tree/<branch-name>`
+
+**b) Add a web link to the Jira ticket** pointing to the branch (shows in the Links section):
+```
+fetch(
+  url="https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3/issue/<ticket-key>/remotelink",
+  method="POST",
+  headers={ "Content-Type": "application/json" },
+  body={
+    "object": {
+      "url": "<branch-url>",
+      "title": "Branch: <branch-name>",
+      "icon": { "url16x16": "https://github.com/favicon.ico", "title": "GitHub" }
+    }
+  }
+)
+```
+
+**c) Add a comment with the clickable branch link:**
+```
+addCommentToJiraIssue(
+  cloudId="...",
+  issueIdOrKey="<ticket-key>",
+  contentFormat="adf",
+  commentBody={
+    "type": "doc", "version": 1,
+    "content": [{
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "text": "Branch created: " },
+        { "type": "text", "text": "<branch-name>", "marks": [{ "type": "link", "attrs": { "href": "<branch-url>" } }] }
+      ]
+    }]
+  }
+)
+```
+
+**d) Transition the ticket to "In Progress":**
+```
+getTransitionsForJiraIssue(cloudId="...", issueIdOrKey="<ticket-key>")
+```
+Pick the "In Progress" transition, then:
+```
+transitionJiraIssue(cloudId="...", issueIdOrKey="<ticket-key>", transitionId="...")
+```
+
+---
+
 ## Step 6: Update the Jira Ticket
 
 Once on the branch, update the ticket using Atlassian Document Format (ADF). Structure the description as:
@@ -138,8 +195,8 @@ Display a final summary:
 ```
 ✅ Jira ticket updated and implementation complete
 
-**Ticket:** <ticket-key> — https://jhsdc.atlassian.net/browse/<ticket-key>
-**Branch:** <branch-name>
+**Ticket:** <ticket-key> — https://jhsdc.atlassian.net/browse/<ticket-key> (In Progress)
+**Branch:** <branch-name> — <branch-url>
 
 **Changes made:**
 - [file or area changed]: [brief description]
