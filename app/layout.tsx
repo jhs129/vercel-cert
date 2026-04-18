@@ -4,11 +4,14 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Header } from "@/components/navigation/header";
 import { Footer } from "@/components/navigation/footer";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
   title: "Vercel App",
   description: "A Next.js shell application.",
 };
+
+const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
 export default function RootLayout({
   children,
@@ -21,6 +24,7 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >
       <body className="container mx-auto min-h-full bg-background text-foreground">
+        {gtmId && <GoogleTagManager gtmId={gtmId} />}
         <Header />
         <main>{children}</main>
         <Footer />
