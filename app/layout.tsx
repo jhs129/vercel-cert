@@ -7,6 +7,10 @@ import { Header } from "@/components/navigation/header";
 import { Footer } from "@/components/navigation/footer";
 import { AlertBanner } from "@/components/ui/AlertBanner";
 import { GoogleTagManager } from "@next/third-parties/google";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Vercel App",
@@ -23,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
+      className={cn("h-full", "antialiased", GeistSans.variable, GeistMono.variable, "font-sans", geist.variable)}
     >
       <body className="min-h-full bg-background text-foreground flex flex-col">
         {gtmId && (
