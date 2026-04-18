@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 
 export type AlertVariant = "breaking" | "warning" | "info";
 
@@ -6,6 +7,7 @@ export interface AlertProps {
   variant?: AlertVariant;
   label?: string;
   message: string;
+  action?: ReactNode;
 }
 
 const variantStyles: Record<
@@ -29,7 +31,7 @@ const variantStyles: Record<
   },
 };
 
-export function Alert({ variant = "breaking", label, message }: AlertProps) {
+export function Alert({ variant = "breaking", label, message, action }: AlertProps) {
   const { iconSrc, iconFilter, badgeBorder } = variantStyles[variant];
 
   return (
@@ -54,6 +56,7 @@ export function Alert({ variant = "breaking", label, message }: AlertProps) {
         </span>
       )}
       <span className="text-sm">{message}</span>
+      {action}
     </div>
   );
 }
