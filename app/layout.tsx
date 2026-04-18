@@ -23,7 +23,7 @@ export default function RootLayout({
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >
-      <body className="container mx-auto min-h-full bg-background text-foreground">
+      <body className="min-h-full bg-background text-foreground flex flex-col">
         {gtmId && (
           <>
             <GoogleTagManager gtmId={gtmId} />
@@ -37,8 +37,10 @@ export default function RootLayout({
             </noscript>
           </>
         )}
-        <Header />
-        <main>{children}</main>
+        <div className="container mx-auto">
+          <Header />
+        </div>
+        <main className="container mx-auto flex-1">{children}</main>
         <Footer />
       </body>
     </html>

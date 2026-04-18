@@ -1,15 +1,14 @@
 "use client";
- import Image from "next/image";
- import Link from "next/link";
+import Image from "next/image";
+import Link from "next/link";
+import { NavLink } from "@/lib/types";
 
- const DEFAULT_LINKS: { href: string; label: string }[] = [
-    { href: "/", label: "Home" },
-    { href: "/search", label: "Search" },
-  ];
-  
+const DEFAULT_LINKS: NavLink[] = [
+  { href: "/", label: "Home" },
+  { href: "/search", label: "Search" },
+];
 
-
-export function Header({ links = DEFAULT_LINKS }: { links?: { href: string; label: string }[] }) {
+export function Header({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
   return (
     <header className="flex flex-row gap-8 mt-8">
       <Link href="/">
