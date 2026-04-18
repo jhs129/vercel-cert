@@ -1,4 +1,4 @@
-import { THEMES } from "./types";
+import { THEMES, ALIGNMENTS } from "./types";
 import type { Theme } from "./types";
 
 export const themeInput = {
@@ -9,6 +9,14 @@ export const themeInput = {
   helperText: "Controls the color theme applied to this component.",
 };
 
+export const ALIGNABLE_BUILDER_INPUT = [
+  {
+    name: "alignment",
+    type: "string",
+    enum: [...ALIGNMENTS],
+    helperText: "Controls the text alignment of inner content. Leave unset to use the component's default.",
+  },
+];
 export const STYLABLE_BUILDER_INPUT = {
   name: "styles",
   type: "string",
