@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Header } from "@/components/navigation/header";
 import { Footer } from "@/components/navigation/footer";
+import { AlertBanner } from "@/components/ui/AlertBanner";
 import { GoogleTagManager } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
@@ -39,6 +41,9 @@ export default function RootLayout({
         )}
         <div className="container mx-auto">
           <Header />
+          <Suspense>
+            <AlertBanner />
+          </Suspense>
         </div>
         <main className="container mx-auto flex-1">{children}</main>
         <Footer />
