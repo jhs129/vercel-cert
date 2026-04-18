@@ -23,7 +23,7 @@ export interface CardImageProps extends Themeable, Stylable {
 }
 
 export default function CardImage({
-  src,
+  src = "https://placehold.co/600x400.png",
   alt,
   headline,
   body,
