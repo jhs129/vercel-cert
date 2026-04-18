@@ -1,2 +1,2 @@
-# vercel-swag
-Vercel Certification Swag Store
+# vercel-cert
+Vercel Certification Demo Site
