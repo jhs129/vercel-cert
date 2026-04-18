@@ -16,3 +16,7 @@ export type Alignment = (typeof ALIGNMENTS)[number];
 export interface Alignable {
   alignment?: Alignment;
 }
+
+export interface Stylable {
+  styles?: string;
+}

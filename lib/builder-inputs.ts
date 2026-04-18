@@ -17,3 +17,10 @@ export const ALIGNABLE_BUILDER_INPUT = [
     helperText: "Controls the text alignment of inner content. Leave unset to use the component's default.",
   },
 ];
+export const STYLABLE_BUILDER_INPUT = {
+  name: "styles",
+  type: "string",
+  required: false,
+  helperText:
+    "Optional Tailwind CSS utility classes to append to this component's top-level element. Classes listed here are applied last, giving them the highest specificity.",
+};
