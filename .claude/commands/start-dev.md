@@ -121,6 +121,13 @@ Inside the worktree, explore the codebase and implement the work:
 - Make only the changes needed to satisfy the acceptance criteria — no scope creep
 - Use `pnpm` as the package manager
 
+**If this ticket introduces or modifies a UI component** (i.e., creates files under `components/ui/`), also create a test page at `app/test/<component-slug>/page.tsx` that:
+- Imports the component directly (no Builder.io)
+- Renders multiple prop variants: default, with all slots filled, with theme variants, and (for card-type components) a multi-card row to verify equal-height alignment
+- Uses a simple `<main className="p-8 space-y-8">` wrapper with no layout chrome
+
+The test page will be accessible at `<vercel-preview-url>/test/<component-slug>` after the branch deployment is ready, and will be linked in the PR and Jira ticket by the create-pr workflow.
+
 After implementing, run the build:
 ```bash
 pnpm install
@@ -133,12 +140,12 @@ Fix any build or lint errors before proceeding. Do not create a PR if the build 
 
 ## Step 8: Create the Pull Request
 
-From inside the worktree, run the create-pr workflow:
+From inside the worktree, run the pull-request workflow:
 
-- The branch name already follows the Jira ticket naming convention, so create-pr will auto-detect the ticket key
-- create-pr will: verify the build, bump the version, push the branch, create the PR, and transition the Jira ticket to In Review
+- The branch name already follows the Jira ticket naming convention, so the workflow auto-detects the ticket key
+- The workflow will: verify the build, create the test page (if a UI component), bump the version, push the branch, create the PR, detect the Vercel preview deployment URL, and post the PR + deployment + test page links to the Jira ticket
 
-Follow all steps in `.claude/commands/create-pr.md`.
+Follow all steps in `.claude/commands/pull-request.md`.
 
 ---
 
@@ -172,6 +179,8 @@ Processed X ticket(s):
 **<TICKET-KEY>** — <Summary>
 - Branch: <branch-name> (pushed to remote)
 - PR: <pr-url>
+- Preview: <vercel-deployment-url>
+- Test page: <vercel-deployment-url>/test/<component-slug>  (if applicable)
 - Jira: https://jhsdc.atlassian.net/browse/<TICKET-KEY> (In Review)
 - Worktree: removed ✓
 ```
