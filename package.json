@@ -1,6 +1,6 @@
 {
   "name": "vercel-cert",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,10 +16,14 @@
     "@builder.io/sdk": "^6.3.0",
     "@builder.io/sdk-react": "^5.2.0",
     "@next/third-parties": "^16.2.4",
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "geist": "^1.7.0",
     "next": "16.2.4",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.2",
