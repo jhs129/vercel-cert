@@ -80,3 +80,56 @@ Tailwind CSS v4 via `@tailwindcss/postcss`. Brand colors are defined as CSS vari
 The footer uses a black background (`bg-black`). Use Tailwind utility classes directly — no CSS modules.
 
 Always use `@apply` with Tailwind classes for all styles in `globals.css`. Never write raw CSS property values (e.g. `font-size: 3.5rem`) — define a named token in `@theme inline` first, then reference it via `@apply`. Custom tokens for typography scale, line heights, letter spacing, etc. live in `@theme inline` so they become named utilities.
+
+### Themeable Interface
+
+Any component that supports theming must implement the `Themeable` interface from `lib/types.ts` and use the shared `themeInput` from `lib/builder-inputs.ts` when registering with Builder.io.
+
+```ts
+// lib/types.ts
+export type Theme = "dark" | "light";
+
+export interface Themeable {
+  theme?: Theme; // defaults to "light"
+}
+```
+
+The component is responsible for applying the appropriate CSS class to its root element:
+
+```tsx
+// components/ui/MyComponent/index.tsx
+"use client";
+
+import type { Themeable } from "@/lib/types";
+
+interface MyComponentProps extends Themeable {
+  title: string;
+}
+
+export default function MyComponent({ title, theme = "light" }: MyComponentProps) {
+  return (
+    <div className={`theme-${theme}`}>
+      <h2>{title}</h2>
+    </div>
+  );
+}
+```
+
+When registering the component with Builder.io, spread `themeInput` into the `inputs` array:
+
+```ts
+// components/ui/MyComponent/MyComponent.builder.ts
+import { Builder } from "@builder.io/sdk-react";
+import { themeInput } from "@/lib/builder-inputs";
+import MyComponent from ".";
+
+Builder.registerComponent(MyComponent, {
+  name: "MyComponent",
+  inputs: [
+    { name: "title", type: "string", defaultValue: "Hello" },
+    themeInput,
+  ],
+});
+```
+
+The `theme-dark` and `theme-light` CSS classes are defined in `app/globals.css`. To add a new theme, add the class there and add the value to the `Theme` union in `lib/types.ts`.
