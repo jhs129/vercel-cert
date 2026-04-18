@@ -1,219 +1,264 @@
 # Fix Jira Item
 
-You are helping refine, clarify, and implement a Jira ticket from the project at https://jhsdc.atlassian.net/browse/
+Review a Jira issue and fix it. Behavior depends on the issue type and status:
 
-The ticket to work on is: $ARGUMENTS
+- **Bug** → create a standalone branch from main, implement the fix, create a PR
+- **Story/Task in "In Review"** → check out the existing story branch, find all open linked bugs and subtasks, fix them on that branch, push to update the open PR
+
+The issue to fix: $ARGUMENTS
+
+If $ARGUMENTS is empty, ask for the issue key before proceeding.
 
 ---
 
-## Step 1: Fetch the Jira Ticket
+## Step 1: Fetch the Issue
 
-First, get the Atlassian cloud ID:
+Get the Atlassian cloud ID:
 ```
 getAccessibleAtlassianResources()
 ```
 
-Then fetch the ticket (strip the base URL if provided — extract just the key like PROJ-123):
+Fetch the issue with full fields:
 ```
 getJiraIssue(
   cloudId="...",
-  issueIdOrKey="<ticket-key>",
-  fields=["summary", "description", "issuetype", "status", "priority", "assignee", "reporter", "labels", "components", "customfield_10016"]
+  issueIdOrKey="<issue-key>",
+  fields=["summary", "description", "issuetype", "status", "priority", "assignee",
+          "reporter", "subtasks", "issuelinks", "comment"]
 )
 ```
 
-Display the current ticket contents clearly:
-- **Summary:** ...
-- **Type:** ...
-- **Status:** ...
-- **Description:** (full text)
-- **Current Acceptance Criteria:** (if present)
+Determine the **flow** based on issue type and status:
+
+| Condition | Flow |
+|-----------|------|
+| Issue type is **Bug** | → [Bug Flow](#bug-flow-steps-2b9b) |
+| Issue type is **Story** or **Task** AND status is **In Review** | → [Story Flow](#story-flow-steps-2s9s) |
+| Issue type is Story/Task but status is NOT In Review | Stop and tell the user: "VS-X is in [status], not In Review. Run /start-dev to implement it first, or move it to In Review before using /fix-jira for feedback fixes." |
 
 ---
 
-## Step 2: Analyze the Ticket
+## Bug Flow (Steps 2B–9B)
 
-Read the ticket carefully and identify:
-1. Are requirements clear and actionable?
-2. Is there missing context (who, what, why, edge cases)?
-3. Are acceptance criteria present and testable?
-4. What clarifying questions would help make this ticket implementation-ready?
+### Step 2B: Understand the Bug
 
----
+Read the description and any comments to understand:
+- What is broken
+- Steps to reproduce (if provided)
+- Expected vs. actual behavior
+- Any linked story for context
 
-## Step 3: Ask Clarifying Questions
+If linked to a parent story, fetch that story's description too for full context.
 
-Present a numbered list of clarifying questions based on what's missing or ambiguous. Reference actual content from the ticket. For example:
-
-- "The description mentions X but doesn't specify Y — can you clarify?"
-- "Should this work for logged-out users as well, or only authenticated users?"
-- "What should happen if Z fails?"
-- "Is there a design or mockup for this feature?"
-
-Wait for the user to respond before proceeding.
-
----
-
-## Step 4: Confirm the Updated Requirements
-
-Based on the user's answers, draft updated content and present it to the user for review before saving:
-
-**Proposed Updated Description:**
-[Rewrite the description with full context, user story format if applicable, and technical notes]
-
-**Proposed Acceptance Criteria:**
-```
-- [ ] Given [context], when [action], then [expected result]
-- [ ] Given [context], when [action], then [expected result]
-- [ ] Edge case: [description of edge case behavior]
-- [ ] Error state: [what happens when X fails]
-```
-
-Ask: "Does this look correct? Should I update the Jira ticket and begin implementation?"
-
----
-
-## Step 5: Create a Feature Branch
-
-**Before updating the ticket or touching any code**, create a local branch from main:
+### Step 3B: Create a Standalone Branch
 
 ```bash
-git checkout main
-git pull origin main
-git checkout -b <ticket-key-lowercase>
+git fetch origin main
+
+# Branch name: <bug-key-lowercase>-<short-slug>
+# e.g., VS-20 "Button hover color wrong" → vs-20-button-hover-color
+git checkout -b vs-<number>-<slug> origin/main
 ```
 
-For example, if the ticket is `VS-3`, create branch `vs-3`. If the ticket summary is descriptive, append a short slug: `vs-3-gtm-support`.
-
-Confirm the branch was created and show the current branch name. **All subsequent work happens on this branch.**
-
----
-
-## Step 5b: Link the Branch to the Jira Ticket and Transition to In Progress
-
-Run these in parallel after the branch is created:
-
-**a) Get the GitHub repo URL** to construct the branch link:
-```bash
-git remote get-url origin
+Transition the bug to **In Progress**:
 ```
-Parse the output to get `https://github.com/<owner>/<repo>`. The branch URL is:
-`https://github.com/<owner>/<repo>/tree/<branch-name>`
-
-**b) Add a web link to the Jira ticket** pointing to the branch (shows in the Links section):
-```
-fetch(
-  url="https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3/issue/<ticket-key>/remotelink",
-  method="POST",
-  headers={ "Content-Type": "application/json" },
-  body={
-    "object": {
-      "url": "<branch-url>",
-      "title": "Branch: <branch-name>",
-      "icon": { "url16x16": "https://github.com/favicon.ico", "title": "GitHub" }
-    }
-  }
-)
+getTransitionsForJiraIssue(cloudId="...", issueIdOrKey="<bug-key>")
+transitionJiraIssue(cloudId="...", issueIdOrKey="<bug-key>", transitionId="<in-progress-id>")
 ```
 
-**c) Add a comment with the clickable branch link:**
-```
-addCommentToJiraIssue(
-  cloudId="...",
-  issueIdOrKey="<ticket-key>",
-  contentFormat="adf",
-  commentBody={
-    "type": "doc", "version": 1,
-    "content": [{
-      "type": "paragraph",
-      "content": [
-        { "type": "text", "text": "Branch created: " },
-        { "type": "text", "text": "<branch-name>", "marks": [{ "type": "link", "attrs": { "href": "<branch-url>" } }] }
-      ]
-    }]
-  }
-)
-```
+### Step 4B: Implement the Fix
 
-**d) Transition the ticket to "In Progress":**
-```
-getTransitionsForJiraIssue(cloudId="...", issueIdOrKey="<ticket-key>")
-```
-Pick the "In Progress" transition, then:
-```
-transitionJiraIssue(cloudId="...", issueIdOrKey="<ticket-key>", transitionId="...")
-```
+Explore the codebase and fix the bug:
+- Read relevant files before editing
+- Make only the changes needed to fix this specific bug — no scope creep
+- Follow CLAUDE.md conventions (Tailwind tokens, server/client split, Builder.io patterns)
+- Use `pnpm` as the package manager
 
----
-
-## Step 6: Update the Jira Ticket
-
-Once on the branch, update the ticket using Atlassian Document Format (ADF). Structure the description as:
-1. Refined requirements section
-2. "Acceptance Criteria" heading followed by a bullet checklist
-
-```
-editJiraIssue(
-  cloudId="...",
-  issueIdOrKey="<ticket-key>",
-  fields={
-    "description": {
-      "type": "doc",
-      "version": 1,
-      "content": [...]
-    }
-  }
-)
-```
-
----
-
-## Step 7: Implement the Fix or Feature
-
-Explore the codebase to understand what needs to change, then implement the work according to the finalized acceptance criteria.
-
-Follow these rules:
-- Read relevant files before editing them
-- Make only the changes needed to satisfy the acceptance criteria — no scope creep
-- Follow existing code patterns and conventions (see CLAUDE.md)
-- Use pnpm as the package manager if dependencies are needed
-- Do NOT commit any changes — leave everything as unstaged working tree changes for the user to review
-
-After implementing, run the build to verify no errors:
+After implementing:
 ```bash
 pnpm build
 ```
+Fix any build or lint errors. Do not proceed if the build fails.
 
-Fix any build or lint errors before finishing.
+### Step 5B: Create the Pull Request
+
+Follow all steps in `.claude/commands/pull-request.md`.
+
+The workflow will:
+- Detect Vercel preview deployment
+- Create a test page if a UI component was modified
+- Bump the version and push
+- Create the PR
+- Post links to the Jira bug ticket and transition it to In Review
+
+### Step 6B: Summary
+
+```
+✅ Bug fix complete
+
+**Bug:** <bug-key> — <summary>
+- Branch: <branch-name>
+- PR: <pr-url>
+- Preview: <vercel-deployment-url>
+- Jira: https://jhsdc.atlassian.net/browse/<bug-key> (In Review)
+```
 
 ---
 
-## Step 8: Summary (changes are NOT committed)
+## Story Flow (Steps 2S–9S)
 
-Display a final summary:
+This flow handles a story that is already In Review (PR open from `/start-dev`). The user has tested the PR, identified issues, and logged them as linked bugs or subtasks. This flow checks out the existing branch and fixes all open linked issues in place.
+
+### Step 2S: Find Open Linked Issues
+
+From the fetched story, collect all open issues to fix:
+
+**Subtasks** — from `fields.subtasks`:
+```
+For each subtask where status != "Done":
+  getJiraIssue(cloudId="...", issueIdOrKey="<subtask-key>", fields=["summary", "description", "status", "issuetype"])
+```
+
+**Linked bugs** — from `fields.issuelinks`:
+```
+For each issuelink where the linked issue type is "Bug" AND the linked issue status != "Done":
+  getJiraIssue(cloudId="...", issueIdOrKey="<linked-key>", fields=["summary", "description", "status", "issuetype"])
+```
+
+If no open subtasks or linked bugs are found, report: "No open linked issues found for VS-X. Nothing to fix." and stop.
+
+Display the list of issues to be fixed before proceeding.
+
+### Step 3S: Find and Check Out the Existing Story Branch
+
+Derive the branch name from the story key and summary (same convention used by `/start-dev`):
+```bash
+# Pattern: vs-<number>-<summary-slug>
+# e.g., VS-9 "Button Component" → vs-9-button-component
+BRANCH="vs-<number>-<slug>"
+```
+
+Verify the branch exists on the remote and check it out:
+```bash
+git fetch origin
+git checkout <branch-name>
+git pull origin <branch-name>
+```
+
+If the branch is not found, try looking up the open PR for the story:
+```bash
+gh pr list --state open --json number,headRefName,url \
+  --jq ".[] | select(.headRefName | test(\"vs-<number>\"))"
+```
+
+Use the `headRefName` from the PR as the branch name. If still not found, stop and ask the user to confirm the branch name.
+
+### Step 4S: Fix Each Linked Issue
+
+For each open linked issue (subtasks first, then linked bugs), in sequence:
+
+1. **Read the issue** to understand what needs to be fixed
+2. **Transition to In Progress**:
+   ```
+   transitionJiraIssue(cloudId="...", issueIdOrKey="<issue-key>", transitionId="<in-progress-id>")
+   ```
+3. **Implement the fix** in the worktree — make only the changes needed for this specific issue
+4. **Commit the fix** with a descriptive message referencing the issue key:
+   ```bash
+   git add <changed-files>
+   git commit -m "fix: <brief description> (<issue-key>)"
+   ```
+5. **Transition the issue to Done**:
+   ```
+   transitionJiraIssue(cloudId="...", issueIdOrKey="<issue-key>", transitionId="<done-id>")
+   ```
+6. **Add a comment** to the linked issue noting it was fixed:
+   ```
+   addCommentToJiraIssue(
+     cloudId="...",
+     issueIdOrKey="<issue-key>",
+     contentFormat="markdown",
+     commentBody="Fixed in branch `<branch-name>` as part of VS-<story-number> PR feedback."
+   )
+   ```
+
+After all issues are fixed, run the build to verify everything works together:
+```bash
+pnpm build
+```
+Fix any build or lint errors before proceeding.
+
+### Step 5S: Push the Branch
+
+```bash
+git push origin <branch-name>
+```
+
+This automatically updates the already-open PR — no new PR creation needed.
+
+### Step 6S: Detect Updated Vercel Deployment
+
+After pushing, poll for the updated Vercel preview deployment:
+```
+list_deployments(projectId="vercel-cert", target="preview", gitBranch="<branch-name>", limit=1)
+```
+Poll `get_deployment` until READY (up to 3 min). Record the updated deployment URL.
+
+### Step 7S: Update the Story's Jira Ticket
+
+Add a comment to the **story** ticket summarizing what was fixed:
+```
+addCommentToJiraIssue(
+  cloudId="...",
+  issueIdOrKey="<story-key>",
+  contentFormat="adf",
+  commentBody={
+    "type": "doc", "version": 1,
+    "content": [
+      { "type": "paragraph", "content": [{ "type": "text", "text": "PR feedback fixes applied:" }] },
+      {
+        "type": "bulletList",
+        "content": [
+          // One listItem per fixed issue: "<issue-key>: <summary> — fixed"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          { "type": "text", "text": "Updated preview: " },
+          { "type": "text", "text": "<deployment-url>", "marks": [{ "type": "link", "attrs": { "href": "https://<deployment-url>" } }] }
+        ]
+      }
+    ]
+  }
+)
+```
+
+### Step 8S: Summary
 
 ```
-✅ Jira ticket updated and implementation complete
+✅ Story feedback fixes complete
 
-**Ticket:** <ticket-key> — https://jhsdc.atlassian.net/browse/<ticket-key> (In Progress)
-**Branch:** <branch-name> — <branch-url>
+**Story:** <story-key> — <summary>
+- Branch: <branch-name> (pushed — existing PR updated)
+- PR: <existing-pr-url>
+- Preview: <updated-deployment-url>
+- Jira: https://jhsdc.atlassian.net/browse/<story-key>
 
-**Changes made:**
-- [file or area changed]: [brief description]
-- [file or area changed]: [brief description]
-
-**Acceptance Criteria Status:**
-- [ ] [criterion 1]
-- [ ] [criterion 2]
-
-All changes are unstaged. Review with `git diff` then commit when ready.
+Fixed issues:
+- <issue-key>: <summary> → Done
+- <issue-key>: <summary> → Done
 ```
 
 ---
 
 ## Notes
 
-- If $ARGUMENTS is empty, ask for the ticket ID before proceeding
-- If the ticket already has clear acceptance criteria, skip straight to confirming them before implementation
-- If main is not the default branch, use whatever the repo's default branch is (`git symbolic-ref refs/remotes/origin/HEAD`)
-- Do not commit, push, or create a PR — leave that to the user
+- **Bug flow** creates a new branch and new PR — it is independent of any story branch
+- **Story flow** works on the existing branch in-place; the open PR is updated automatically on push
+- For the story flow, only fix issues that are explicitly linked to the story (subtasks or issue links) — do not scan for issues by keyword or heuristic
+- If a linked issue has no description, add a Jira comment asking for clarification and skip that issue rather than guessing
+- Always run `pnpm build` after all fixes and before pushing
+- Jira project key: `VS` | Cloud ID: `c546b8b8-c5e9-4677-8322-7a935c3d3860`
+- Jira base URL: `https://jhsdc.atlassian.net/browse/`
+- Use `pnpm`, not npm or yarn
