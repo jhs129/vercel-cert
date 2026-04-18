@@ -11,6 +11,40 @@ pnpm lint         # Run ESLint
 pnpm storybook    # Start Storybook on port 6006
 ```
 
+## DevOps Workflow
+
+This project uses an agentic CI/CD pipeline driven by Jira statuses. Human review gates are at Requirements Review and PR review.
+
+```
+TO DO → GROOMING → REQUIREMENTS REVIEW → DEV READY → IN PROGRESS → IN REVIEW → DONE
+```
+
+**Jira:** `https://jhsdc.atlassian.net` | Project key: `VS`
+
+### Status Definitions
+
+| Status | Owner | Description |
+|--------|-------|-------------|
+| To Do | Human | Writing initial high-level requirements |
+| Grooming | Agent (`/groom`) | Agent refines requirements, posts assumptions/questions as comments, writes AC, transitions to Requirements Review |
+| Blocked | Agent | Ticket too vague to groom — agent posts comment explaining what's needed |
+| Requirements Review | Human | Review grooming output; approve → Dev Ready, reject → back to Grooming (add comment with feedback) |
+| Dev Ready | Agent (`/start-dev`) | Agent creates worktree, implements, builds, creates PR, transitions to In Review |
+| In Progress | Agent | Active development happening in a git worktree |
+| In Review | Human | PR open on GitHub; review and merge |
+| Done | Human | Merged and complete |
+
+### Agent Commands
+
+- **`/groom [ticket-key]`** — Refines one ticket or all Grooming tickets. Non-interactive: posts questions as Jira comments rather than asking interactively. Handles re-grooming by reading prior comment feedback.
+- **`/start-dev [ticket-key]`** — Implements one ticket or all Dev Ready tickets in parallel git worktrees. Pulls Vercel dev env vars, implements, creates PR, removes worktree after PR is created.
+- **`/fix-jira <ticket-key>`** — Interactive single-ticket refinement + implementation (original manual workflow).
+- **`/create-pr`** — Creates a PR for the current branch with Jira integration and version bump.
+
+### Worktree Convention
+
+Each `start-dev` ticket creates a worktree at `../<branch-name>` relative to the repo root. Worktrees are always removed after PR creation. Branch naming: `vs-<number>-<slug>` (e.g. `vs-8-cardimage-component`).
+
 ## Architecture
 
 This is a Next.js 16 App Router application using Builder.io as the primary CMS.
