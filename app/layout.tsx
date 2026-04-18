@@ -24,7 +24,19 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >
       <body className="container mx-auto min-h-full bg-background text-foreground">
-        {gtmId && <GoogleTagManager gtmId={gtmId} />}
+        {gtmId && (
+          <>
+            <GoogleTagManager gtmId={gtmId} />
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+                height="0"
+                width="0"
+                style={{ display: "none", visibility: "hidden" }}
+              />
+            </noscript>
+          </>
+        )}
         <Header />
         <main>{children}</main>
         <Footer />
