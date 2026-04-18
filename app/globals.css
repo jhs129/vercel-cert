@@ -3,8 +3,10 @@
 
 :root {
   /* Brand colors */
-  --color-background: #000000;
-  --color-foreground: #ffffff;
+  --color-background: #ffffff;
+  --color-foreground: #000000;
+  --color-primary-light: #ffffff;
+  --color-primary-dark: #000000;
   --color-accent: #0070f3;
 
   /* Scrollbar colors */
@@ -14,8 +16,8 @@
 }
 
 @theme inline {
-  --color-background: var(--color-background);
-  --color-foreground: var(--color-foreground);
+  --color-background: var(--color-primary-light);
+  --color-foreground: var(--color-primary-dark);
   --color-accent: var(--color-accent);
   --color-scrollbar-track: var(--color-scrollbar-track);
   --color-scrollbar-thumb: var(--color-scrollbar-thumb);

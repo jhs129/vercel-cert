@@ -71,7 +71,10 @@ This decoupling means the CMS can be swapped by only touching `index.tsx`.
 
 ### Styling
 
-Tailwind CSS v4 via `@tailwindcss/postcss`. Theme variables are in `app/globals.css` under `@theme inline`:
-- `--background: #000000`, `--foreground: #ffffff`, `--accent: #0070f3`
+Tailwind CSS v4 via `@tailwindcss/postcss`. Brand colors are defined as CSS variables in `:root` in `app/globals.css` and mapped to Tailwind tokens via `@theme inline`. Always use these tokens — never hardcode hex values or arbitrary `bg-[#xxx]` classes.
 
-Dark-first design: black background, white text, blue/purple gradients for accents. Use Tailwind utility classes directly — no CSS modules.
+- `--color-background: #ffffff` (page background — white)
+- `--color-foreground: #000000`
+- `--color-accent: #0070f3`
+
+The footer uses a black background (`bg-black`). Use Tailwind utility classes directly — no CSS modules.
