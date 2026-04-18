@@ -45,7 +45,7 @@ export default function RootLayout({
             <AlertBanner />
           </Suspense>
         </div>
-        <main className="container mx-auto flex-1">{children}</main>
+        <main className="container mx-auto flex-1 py-8">{children}</main>
         <Footer />
       </body>
     </html>
