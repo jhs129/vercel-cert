@@ -78,3 +78,5 @@ Tailwind CSS v4 via `@tailwindcss/postcss`. Brand colors are defined as CSS vari
 - `--color-accent: #0070f3`
 
 The footer uses a black background (`bg-black`). Use Tailwind utility classes directly — no CSS modules.
+
+Always use `@apply` with Tailwind classes for all styles in `globals.css`. Never write raw CSS property values (e.g. `font-size: 3.5rem`) — define a named token in `@theme inline` first, then reference it via `@apply`. Custom tokens for typography scale, line heights, letter spacing, etc. live in `@theme inline` so they become named utilities.

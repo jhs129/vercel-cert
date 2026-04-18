@@ -10,7 +10,7 @@ const DEFAULT_LINKS: NavLink[] = [
 
 export function Header({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
   return (
-    <header className="flex flex-row gap-8 mt-8">
+    <header className="theme-light flex flex-row gap-8 mt-8">
       <Link href="/">
         <Image src="/mark.svg" alt="Logo" width={100} height={100} />
       </Link>

@@ -9,21 +9,55 @@
   --color-primary-dark: #000000;
   --color-accent: #0070f3;
 
+  /* Semantic colors */
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-code-bg: #f3f4f6;
+  --color-dark-muted: #9ca3af;
+
   /* Scrollbar colors */
   --color-scrollbar-track: #111111;
   --color-scrollbar-thumb: #333333;
   --color-scrollbar-thumb-hover: #555555;
+
+  /* Contextual link color — overridden by theme classes */
+  --color-link: var(--color-accent);
+}
+
+/* Theme overrides — change contextual tokens without touching utilities */
+.theme-dark {
+  --color-link: var(--color-primary-light);
+}
+
+.theme-light {
+  --color-link: var(--color-primary-dark);
 }
 
 @theme inline {
+  /* Colors */
   --color-background: var(--color-primary-light);
   --color-foreground: var(--color-primary-dark);
   --color-accent: var(--color-accent);
+  --color-muted: var(--color-muted);
+  --color-border: var(--color-border);
+  --color-code-bg: var(--color-code-bg);
+  --color-dark-muted: var(--color-dark-muted);
   --color-scrollbar-track: var(--color-scrollbar-track);
   --color-scrollbar-thumb: var(--color-scrollbar-thumb);
   --color-scrollbar-thumb-hover: var(--color-scrollbar-thumb-hover);
+
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+@layer components {
+  .theme-dark {
+    @apply bg-foreground text-background;
+  }
+  .theme-light {
+    @apply bg-background text-foreground;
+  }
 }
 
 @layer base {
@@ -36,23 +70,54 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    @apply bg-background text-foreground font-sans leading-relaxed;
   }
 
-  ::-webkit-scrollbar {
-    @apply w-1.5;
-  }
+  /* Headings */
+  h1 { @apply text-5xl font-bold tracking-tighter leading-tight text-foreground mb-3; }
+  h2 { @apply text-4xl font-bold tracking-tight leading-tight text-foreground mb-3; }
+  h3 { @apply text-3xl font-semibold tracking-tight leading-tight text-foreground mb-3; }
+  h4 { @apply text-2xl font-semibold tracking-tight leading-snug text-foreground mb-3; }
+  h5 { @apply text-xl font-semibold leading-snug text-foreground mb-3; }
+  h6 { @apply text-base font-semibold leading-normal text-foreground mb-3; }
 
-  ::-webkit-scrollbar-track {
-    @apply bg-scrollbar-track;
-  }
+  /* Body text */
+  p { @apply mb-5 leading-relaxed; }
 
-  ::-webkit-scrollbar-thumb {
-    @apply rounded-[3px] bg-scrollbar-thumb;
+  /* Links — color driven by contextual --color-link, set to accent by default */
+  a {
+    color: var(--color-link);
+    @apply no-underline transition-all duration-150;
   }
+  a:hover { @apply underline; }
 
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-scrollbar-thumb-hover;
-  }
+  /* Images */
+  img { @apply max-w-full h-auto block; }
+
+  /* Lists */
+  ul { @apply list-disc pl-6 mb-5; }
+  ol { @apply list-decimal pl-6 mb-5; }
+  li { @apply mb-1.5 leading-relaxed; }
+
+  /* Blockquote */
+  blockquote { @apply border-l-[3px] border-accent pl-5 my-6 text-muted italic; }
+
+  /* Code */
+  code { @apply font-mono text-sm bg-code-bg border border-border rounded px-1.5 py-0.5; }
+  pre { @apply font-mono text-sm bg-code-bg border border-border rounded-lg px-5 py-4 overflow-x-auto mb-5 leading-relaxed; }
+  pre code { @apply bg-transparent border-0 p-0; }
+
+  /* Horizontal rule */
+  hr { @apply border-0 border-t border-border my-8; }
+
+  /* Inline text */
+  strong { @apply font-bold; }
+  em { @apply italic; }
+  small { @apply text-sm text-muted; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { @apply w-1.5; }
+  ::-webkit-scrollbar-track { @apply bg-scrollbar-track; }
+  ::-webkit-scrollbar-thumb { @apply rounded-[3px] bg-scrollbar-thumb; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-scrollbar-thumb-hover; }
 }
