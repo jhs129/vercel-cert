@@ -9,3 +9,7 @@ export type Theme = (typeof THEMES)[number];
 export interface Themeable {
   theme?: Theme;
 }
+
+export interface Stylable {
+  styles?: string;
+}
