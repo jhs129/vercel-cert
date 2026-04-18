@@ -39,13 +39,13 @@ export default function RootLayout({
             </noscript>
           </>
         )}
-        <div className="container mx-auto">
+        <div className="container mx-auto p-5">
           <Header />
           <Suspense>
             <AlertBanner />
           </Suspense>
         </div>
-        <main className="container mx-auto flex-1 py-8">{children}</main>
+        <main className="container mx-auto flex-1 p-5">{children}</main>
         <Footer />
       </body>
     </html>
