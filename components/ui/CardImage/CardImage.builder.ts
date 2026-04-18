@@ -12,6 +12,7 @@ register("component", {
       type: "file",
       allowedFileTypes: ["jpeg", "jpg", "png", "webp", "gif", "svg"],
       required: true,
+      defaultValue: "https://placehold.co/600x338.png",
       helperText: "Card image (16:9 aspect ratio recommended)",
     },
     {
