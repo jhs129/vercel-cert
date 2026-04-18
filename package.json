@@ -1,6 +1,6 @@
 {
-  "name": "vercel-swag",
-  "version": "0.1.13",
+  "name": "vercel-cert",
+  "version": "0.1.14",
   "private": true,
   "scripts": {
     "dev": "next dev",
