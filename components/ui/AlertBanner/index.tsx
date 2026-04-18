@@ -11,8 +11,7 @@ export async function AlertBanner() {
   const headersList = await headers();
   const urlPath = headersList.get("x-pathname") ?? "/";
 
-  // Use a custom fetch so non-OK responses (e.g. model not found) return empty
-  // results instead of letting the SDK log its own console.error before throwing.
+  // Intercept non-OK responses so the SDK doesn't log its own console.error
   const safeFetch = async (input: string, init?: object) => {
     const res = await fetch(input, init as RequestInit);
     if (!res.ok) return new Response(JSON.stringify({ results: [] }), { status: 200 });
