@@ -12,7 +12,7 @@ pnpm lint       # Run ESLint
 
 ## Architecture
 
-This is a Next.js 16 App Router e-commerce store using static data (no database or external API).
+This is a Next.js 16 App Router news site leveraging builder.io as a CMS
 
 ### Data Layer (`lib/`)
 
