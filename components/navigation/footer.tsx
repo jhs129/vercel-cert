@@ -25,7 +25,7 @@ export function Footer({
 
   return (
     <footer
-      className={`bg-black text-gray-200 w-full mt-auto ${className}`}
+      className={`theme-dark w-full mt-auto px-5 ${className}`}
     >
       <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <Link href="/" className="shrink-0">
@@ -37,17 +37,16 @@ export function Footer({
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm hover:text-white transition-colors"
+              className="text-sm"
             >
               {link.label}
             </Link>
           ))}
         </nav>
-
-        <p className="text-sm text-gray-400">
-          &copy; {year} {copyrightText}
-        </p>
       </div>
+      <p className="text-sm text-center pb-6">
+        &copy; {year} {copyrightText}
+      </p>
     </footer>
   );
 }
