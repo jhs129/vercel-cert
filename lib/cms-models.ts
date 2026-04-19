@@ -32,6 +32,7 @@ export interface CmsArticle extends CmsContent {
   data: {
     slug?: string;
     title?: string;
+    categories?: string[];
     metadata?: CmsMetadata;
     publishDate?: number;
   };
