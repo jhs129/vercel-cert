@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { fetchEntries } from "@builder.io/sdk-react";
 import { AlertBannerClient } from "./AlertBannerClient";
-import type { AlertVariant } from "@/components/ui/Alert";
+import type { CmsAlert } from "@/lib/cms-models";
 
 const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY;
 
@@ -32,11 +32,15 @@ export async function AlertBanner() {
 
   if (!entries.length) return null;
 
-  const alerts = entries.map((entry) => ({
+  const alerts: CmsAlert[] = entries.map((entry) => ({
     id: entry.id ?? "",
-    variant: (entry.data?.variant as AlertVariant) ?? "info",
-    label: entry.data?.label as string | undefined,
-    message: (entry.data?.message as string) ?? "",
+    name: (entry.name as string) ?? "",
+    published: (entry.published as string) ?? "",
+    data: {
+      variant: entry.data?.variant as string | undefined,
+      label: (entry.data?.label as string) ?? "",
+      message: (entry.data?.message as string) ?? "",
+    },
   }));
 
   return <AlertBannerClient alerts={alerts} />;
