@@ -1,19 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { DismissButton } from "@/components/ui/Alert/DismissButton";
 import type { AlertVariant } from "@/components/ui/Alert";
-
-export interface AlertItem {
-  id: string;
-  variant: AlertVariant;
-  label?: string;
-  message: string;
-}
+import type { CmsAlert } from "@/lib/cms-models";
 
 interface AlertBannerClientProps {
-  alerts: AlertItem[];
+  alerts: CmsAlert[];
 }
 
 const COOKIE_PREFIX = "alert-dismissed-";
@@ -47,9 +41,9 @@ export function AlertBannerClient({ alerts }: AlertBannerClientProps) {
       {visible.map((alert) => (
         <Alert
           key={alert.id}
-          variant={alert.variant}
-          label={alert.label}
-          message={alert.message}
+          variant={(alert.data.variant as AlertVariant) ?? "info"}
+          label={alert.data.label}
+          message={alert.data.message}
           action={<DismissButton onClick={() => dismiss(alert.id)} />}
         />
       ))}
