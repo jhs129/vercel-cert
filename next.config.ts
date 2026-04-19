@@ -6,6 +6,7 @@ const nextConfig: NextConfig = BuilderDevTools()({
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "placehold.co" },
+      { protocol: "https", hostname: "cdn.builder.io" },
     ],
   },
 });
