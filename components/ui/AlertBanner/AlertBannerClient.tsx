@@ -41,9 +41,9 @@ export function AlertBannerClient({ alerts }: AlertBannerClientProps) {
       {visible.map((alert) => (
         <Alert
           key={alert.id}
-          variant={(alert.variant as AlertVariant) ?? "info"}
-          label={alert.label}
-          message={alert.message}
+          variant={(alert.data.variant as AlertVariant) ?? "info"}
+          label={alert.data.label}
+          message={alert.data.message}
           action={<DismissButton onClick={() => dismiss(alert.id)} />}
         />
       ))}

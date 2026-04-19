@@ -34,9 +34,11 @@ export async function AlertBanner() {
 
   const alerts: CmsAlert[] = entries.map((entry) => ({
     id: entry.id ?? "",
-    variant: entry.data?.variant as string | undefined,
-    label: (entry.data?.label as string) ?? "",
-    message: (entry.data?.message as string) ?? "",
+    data: {
+      variant: entry.data?.variant as string | undefined,
+      label: (entry.data?.label as string) ?? "",
+      message: (entry.data?.message as string) ?? "",
+    },
   }));
 
   return <AlertBannerClient alerts={alerts} />;
