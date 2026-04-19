@@ -11,9 +11,9 @@ const meta: Meta<typeof SearchInput> = {
   },
   tags: ["autodocs"],
   args: {
-    onSearch: fn(),
     value: "",
     onChange: fn(),
+    onSearch: fn(),
   },
 };
 

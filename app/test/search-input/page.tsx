@@ -5,6 +5,8 @@ import SearchInput from "@/components/ui/SearchInput";
 
 export default function SearchInputTestPage() {
   const [value, setValue] = useState("");
+  const [prefilledValue, setPrefilledValue] = useState("Next.js");
+  const [narrowValue, setNarrowValue] = useState("");
   const [lastQuery, setLastQuery] = useState<string | null>(null);
 
   const handleSearch = (query: string) => {
@@ -21,9 +23,14 @@ export default function SearchInputTestPage() {
       </section>
 
       <section className="space-y-2">
+        <h2 className="font-semibold text-lg">With initial value</h2>
+        <SearchInput value={prefilledValue} onChange={setPrefilledValue} onSearch={handleSearch} />
+      </section>
+
+      <section className="space-y-2">
         <h2 className="font-semibold text-lg">Narrow container (320px)</h2>
         <div className="w-80">
-          <SearchInput value={value} onChange={setValue} onSearch={handleSearch} />
+          <SearchInput value={narrowValue} onChange={setNarrowValue} onSearch={handleSearch} />
         </div>
       </section>
 
