@@ -33,6 +33,6 @@ export interface CmsArticle extends CmsContent {
     slug?: string;
     title?: string;
     metadata?: CmsMetadata;
-    publishDate?: string;
+    publishDate?: number;
   };
 }
