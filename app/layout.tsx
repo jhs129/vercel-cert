@@ -15,6 +15,22 @@ const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 export const metadata: Metadata = {
   title: "Vercel News Site",
   description: "A sample news site built with Next.js and Builder.io",
+  metadataBase: new URL("https://vercel-cert.jhsdigitalconsulting.com"),
+  openGraph: {
+    title: "Vercel News Site",
+    description: "A sample news site built with Next.js and Builder.io",
+    url: "https://vercel-cert.jhsdigitalconsulting.com",
+    siteName: "Vercel News Site",
+    images: [
+      { url: "https://vercel-cert.jhsdigitalconsulting.com/og-image.png" },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vercel News Site",
+    description: "A sample news site built with Next.js and Builder.io",
+    images: ["https://vercel-cert.jhsdigitalconsulting.com/og-image.png"],
+  },
 };
 
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
