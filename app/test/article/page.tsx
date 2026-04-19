@@ -2,6 +2,15 @@ import { ArticleClient } from "@/app/content/[slug]/ArticleClient";
 
 const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY ?? "";
 
+function formatDate(timestamp: number): string {
+  return new Date(timestamp).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export default function ArticleTestPage() {
   return (
     <main className="p-8 space-y-16">
@@ -14,7 +23,7 @@ export default function ArticleTestPage() {
             content={null}
             apiKey={BUILDER_API_KEY}
             title="Breaking: Next.js 16 Ships with Turbopack by Default"
-            publishDate={1745712000000}
+            formattedDate={formatDate(1745712000000)}
             heroImage="https://placehold.co/1200x630.png"
           />
         </div>
@@ -27,20 +36,20 @@ export default function ArticleTestPage() {
             content={null}
             apiKey={BUILDER_API_KEY}
             title="Edge Case: Article Without a Hero Image"
-            publishDate={1745712000000}
+            formattedDate={formatDate(1745712000000)}
             heroImage={undefined}
           />
         </div>
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold mb-4 text-muted">No hero image, no date (publishDate=0)</h2>
+        <h2 className="text-lg font-semibold mb-4 text-muted">No hero image, no date</h2>
         <div className="border border-border rounded-lg overflow-hidden">
           <ArticleClient
             content={null}
             apiKey={BUILDER_API_KEY}
             title="Edge Case: No Date or Hero"
-            publishDate={0}
+            formattedDate={null}
             heroImage={undefined}
           />
         </div>
