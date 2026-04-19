@@ -58,7 +58,9 @@ Two Builder.io models are in use:
 - **`page`** — drives the catch-all route. Every URL not claimed by a static Next.js route is fetched from this model and rendered via `<Content>`.
 - **`alert`** — URL-targeted alert banners fetched on every page and rendered just below the header via the `AlertBanner` component.
 
-Required environment variable: `NEXT_PUBLIC_BUILDER_API_KEY`.
+Required environment variables:
+- `NEXT_PUBLIC_BUILDER_API_KEY` — Builder.io public API key (required; all pages return 404 without it)
+- `NEXT_PUBLIC_SITE_URL` — canonical base URL (e.g. `https://example.com`); if unset, canonical URLs and `og:url` tags are omitted from all pages
 
 #### Fetch pattern
 
