@@ -21,23 +21,28 @@ export default meta;
 
 type Story = StoryObj<typeof SearchInput>;
 
+function ControlledSearchInput(props: { onSearch: (q: string) => void }) {
+  const [value, setValue] = useState("");
+  return <SearchInput value={value} onChange={setValue} onSearch={props.onSearch} />;
+}
+
 export const Default: Story = {
-  decorators: [
-    (Story) => (
-      <div className="w-96">
-        <Story />
-      </div>
-    ),
-  ],
+  render: (args) => (
+    <div className="w-96">
+      <ControlledSearchInput onSearch={args.onSearch} />
+    </div>
+  ),
 };
 
 export const WithInitialValue: Story = {
   render: (args) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [value, setValue] = useState("Next.js");
+    function WithValue() {
+      const [value, setValue] = useState("Next.js");
+      return <SearchInput value={value} onChange={setValue} onSearch={args.onSearch} />;
+    }
     return (
       <div className="w-96">
-        <SearchInput {...args} value={value} onChange={setValue} />
+        <WithValue />
       </div>
     );
   },

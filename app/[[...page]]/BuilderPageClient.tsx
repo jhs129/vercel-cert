@@ -2,6 +2,7 @@
 
 import { Content, isPreviewing } from "@builder.io/sdk-react";
 import type { BuilderContent } from "@builder.io/sdk-react";
+import { customComponents } from "@/lib/builder-registry";
 
 interface BuilderPageClientProps {
   content: BuilderContent | null;
@@ -17,6 +18,7 @@ export function BuilderPageClient({ content, apiKey }: BuilderPageClientProps) {
       content={content}
       apiKey={apiKey}
       canTrack={false}
+      customComponents={customComponents}
     />
   );
 }
