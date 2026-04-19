@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(pnpm build*)",
+            "command": "cd /Users/johnhschneider/dev/vercel-cert && node scripts/check-hydration.mjs",
+            "statusMessage": "Checking for hydration errors...",
+            "asyncRewake": true
+          },
+          {
+            "type": "command",
+            "if": "Bash(gh pr create*)",
+            "command": "cd /Users/johnhschneider/dev/vercel-cert && node scripts/check-hydration.mjs",
+            "statusMessage": "Checking for hydration errors before PR...",
+            "asyncRewake": true
+          }
+        ]
+      }
+    ]
+  }
+}
