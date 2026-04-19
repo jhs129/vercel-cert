@@ -1,8 +1,8 @@
-import { register } from "@builder.io/sdk-react";
+import type { RegisteredComponent } from "@builder.io/sdk-react";
 import { themeInput, STYLABLE_BUILDER_INPUT } from "@/lib/builder-inputs";
 import CardImage from ".";
 
-register("component", {
+export const CardImageRegistration: RegisteredComponent = {
   component: CardImage,
   name: "CardImage",
   canHaveChildren: true,
@@ -39,11 +39,15 @@ register("component", {
     {
       name: "headingLevel",
       type: "number",
-      enum: [2, 3, 4],
+      enum: [
+        { label: "h2", value: 2 },
+        { label: "h3", value: 3 },
+        { label: "h4", value: 4 },
+      ],
       defaultValue: 3,
       helperText: "Semantic heading level for the headline (h2, h3, or h4)",
     },
     themeInput,
     STYLABLE_BUILDER_INPUT,
   ],
-});
+};
