@@ -2,21 +2,13 @@ import { headers } from "next/headers";
 import { fetchEntries } from "@builder.io/sdk-react";
 import { AlertBannerClient } from "./AlertBannerClient";
 import type { CmsAlert } from "@/lib/cms-models";
-
-const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY;
+import { BUILDER_API_KEY, safeFetch } from "@/lib/builder";
 
 export async function AlertBanner() {
   if (!BUILDER_API_KEY) return null;
 
   const headersList = await headers();
   const urlPath = headersList.get("x-pathname") ?? "/";
-
-  // Intercept non-OK responses so the SDK doesn't log its own console.error
-  const safeFetch = async (input: string, init?: object) => {
-    const res = await fetch(input, init as RequestInit);
-    if (!res.ok) return new Response(JSON.stringify({ results: [] }), { status: 200 });
-    return res;
-  };
 
   let entries: Awaited<ReturnType<typeof fetchEntries>> = [];
   try {
