@@ -46,7 +46,7 @@ export const getArticleContent = cache(
       return await fetchOneEntry({
         model: "article",
         apiKey: BUILDER_API_KEY,
-        userAttributes: { urlPath: `/content/${slug}` },
+        query: { 'data.slug': slug },
         options: getBuilderSearchParams(searchParams),
         includeUnpublished: previewing,
         fetch: safeFetch,
