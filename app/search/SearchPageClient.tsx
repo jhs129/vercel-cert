@@ -12,11 +12,14 @@ import SearchLoadingState from "@/components/ui/SearchLoadingState";
 const DEBOUNCE_MS = 300;
 const MIN_AUTO_SEARCH_LENGTH = 3;
 
+const DELAY_MS = 5000;
+
 interface SearchPageClientProps {
   initialQuery: string;
   initialCategory: string | null;
   defaultArticles: CmsArticle[];
   categories: string[];
+  simulateDelay?: boolean;
 }
 
 export default function SearchPageClient({
@@ -24,6 +27,7 @@ export default function SearchPageClient({
   initialCategory,
   defaultArticles,
   categories,
+  simulateDelay = false,
 }: SearchPageClientProps) {
   const router = useRouter();
   const [inputValue, setInputValue] = useState(initialQuery);
@@ -32,7 +36,7 @@ export default function SearchPageClient({
   const [results, setResults] = useState<CmsArticle[]>(
     initialQuery ? [] : defaultArticles
   );
-  const [isLoading, setIsLoading] = useState(!!initialQuery);
+  const [isLoading, setIsLoading] = useState(!!initialQuery || simulateDelay);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -71,6 +75,14 @@ export default function SearchPageClient({
   // Fire initial search if a query was provided via URL
   useEffect(() => {
     if (initialQuery) executeSearch(initialQuery, initialCategory);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Simulate loading state for testing purposes when ?delay=true
+  useEffect(() => {
+    if (!simulateDelay) return;
+    const timer = setTimeout(() => setIsLoading(false), DELAY_MS);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

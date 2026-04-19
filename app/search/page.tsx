@@ -8,13 +8,14 @@ export const metadata: Metadata = {
 };
 
 interface SearchPageProps {
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; delay?: string }>;
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const initialQuery = params.q?.trim() ?? "";
   const initialCategory = params.category ?? null;
+  const simulateDelay = params.delay === "true";
 
   const [defaultArticles, categories] = await Promise.all([
     fetchArticles(5),
@@ -27,6 +28,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       initialCategory={initialCategory}
       defaultArticles={defaultArticles}
       categories={categories}
+      simulateDelay={simulateDelay}
     />
   );
 }
