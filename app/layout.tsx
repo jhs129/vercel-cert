@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: "Vercel App",
-  description: "A Next.js shell application.",
+  title: "Vercel News Site",
+  description: "A sample news site built with Next.js and Builder.io",
 };
 
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
