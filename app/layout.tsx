@@ -59,13 +59,13 @@ export default function RootLayout({
             </noscript>
           </>
         )}
-        <div className="container mx-auto p-5">
+        <div className="container mx-auto px-page-gutter">
           <Header />
           <Suspense>
             <AlertBanner />
           </Suspense>
         </div>
-        <main className="container mx-auto flex-1 p-5">{children}</main>
+        <main className="container mx-auto flex-1 px-page-gutter py-5">{children}</main>
         <Footer />
       </body>
     </html>

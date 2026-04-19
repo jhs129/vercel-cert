@@ -24,29 +24,25 @@ export function Footer({
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      className={`theme-dark w-full mt-auto px-5 ${className}`}
-    >
-      <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
-        <Link href="/" className="shrink-0">
-          <Image src={logo} alt="Logo" width={150} height={100} />
-        </Link>
+    <footer className={`theme-dark w-full mt-auto ${className}`}>
+      <div className="container mx-auto px-page-gutter py-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <Link href="/" className="shrink-0">
+            <Image src={logo} alt="Logo" width={150} height={100} />
+          </Link>
 
-        <nav className="flex flex-wrap justify-center gap-6">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+          <nav className="flex flex-wrap justify-center gap-6">
+            {links.map((link) => (
+              <Link key={link.href} href={link.href} className="text-sm">
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <p className="text-sm text-center pt-6">
+          &copy; {year} {copyrightText}
+        </p>
       </div>
-      <p className="text-sm text-center pb-6">
-        &copy; {year} {copyrightText}
-      </p>
     </footer>
   );
 }
