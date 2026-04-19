@@ -34,6 +34,8 @@ export async function AlertBanner() {
 
   const alerts: CmsAlert[] = entries.map((entry) => ({
     id: entry.id ?? "",
+    name: (entry.name as string) ?? "",
+    published: (entry.published as string) ?? "",
     data: {
       variant: entry.data?.variant as string | undefined,
       label: (entry.data?.label as string) ?? "",
