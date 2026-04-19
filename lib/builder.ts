@@ -38,6 +38,29 @@ export const getPageContent = cache(
   }
 );
 
+export const getArticleContent = cache(
+  async (slug: string, searchParams: Record<string, string | string[]>) => {
+    const previewing = isPreviewing(searchParams);
+    try {
+      return await fetchOneEntry({
+        model: "article",
+        apiKey: BUILDER_API_KEY,
+        userAttributes: { urlPath: `/content/${slug}` },
+        options: getBuilderSearchParams(searchParams),
+        includeUnpublished: previewing,
+        fetch: safeFetch,
+      });
+    } catch (err) {
+      console.error(
+        "[getArticleContent] fetchOneEntry threw for slug %s",
+        slug,
+        err
+      );
+      return null;
+    }
+  }
+);
+
 export function buildUrlPath(page?: string[]): string {
   return "/" + (page?.join("/") ?? "");
 }
