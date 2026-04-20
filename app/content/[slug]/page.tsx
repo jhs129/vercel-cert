@@ -64,12 +64,21 @@ export default async function ArticlePage({
   const meta = content?.data?.metadata as Record<string, unknown> | undefined;
   const heroImage = meta?.media as string | undefined;
 
+  const formattedDate = publishDate
+    ? new Date(publishDate).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      })
+    : null;
+
   return (
     <ArticleClient
       content={content}
       apiKey={BUILDER_API_KEY}
       title={title}
-      publishDate={publishDate}
+      formattedDate={formattedDate}
       heroImage={heroImage}
     />
   );

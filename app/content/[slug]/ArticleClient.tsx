@@ -7,7 +7,7 @@ interface ArticleClientProps {
   content: BuilderContent | null;
   apiKey: string;
   title: string;
-  publishDate: number | undefined;
+  formattedDate: string | null;
   heroImage: string | undefined;
 }
 
@@ -15,22 +15,13 @@ export function ArticleClient({
   content,
   apiKey,
   title,
-  publishDate,
+  formattedDate,
   heroImage,
 }: ArticleClientProps) {
   if (!content && !isPreviewing()) return null;
 
-  const formattedDate =
-    publishDate
-      ? new Date(publishDate).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
-      : null;
-
   return (
-    <article className="max-w-3xl mx-auto px-4 py-8">
+    <article className="max-w-3xl mx-auto py-8">
       {heroImage && (
         <div className="w-full aspect-video mb-8 overflow-hidden rounded-lg">
           <img

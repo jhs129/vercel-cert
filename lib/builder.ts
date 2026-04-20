@@ -1,5 +1,6 @@
 import { fetchOneEntry, fetchEntries, isPreviewing, getBuilderSearchParams } from "@builder.io/sdk-react";
 import { cache } from "react";
+import type { CmsArticle } from "@/lib/cms-models";
 
 export const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY ?? "";
 
@@ -45,7 +46,7 @@ export const getArticleContent = cache(
       return await fetchOneEntry({
         model: "article",
         apiKey: BUILDER_API_KEY,
-        userAttributes: { urlPath: `/content/${slug}` },
+        query: { 'data.slug': slug },
         options: getBuilderSearchParams(searchParams),
         includeUnpublished: previewing,
         fetch: safeFetch,
@@ -65,37 +66,76 @@ export function buildUrlPath(page?: string[]): string {
   return "/" + (page?.join("/") ?? "");
 }
 
-export async function fetchArticles(limit = 5) {
-  try {
-    const entries = await fetchEntries({
-      model: "article",
-      apiKey: BUILDER_API_KEY,
-      limit,
-      sort: { "data.publishDate": -1 },
-      fetch: safeFetch,
-    });
-    return entries ?? [];
-  } catch {
-    return [];
-  }
+function entryToArticle(entry: { id?: string; name?: string; published?: string; data?: Record<string, unknown> | null }): CmsArticle {
+  const d = entry.data ?? {};
+  return {
+    id: entry.id ?? "",
+    name: entry.name ?? "",
+    published: entry.published ?? "",
+    data: {
+      slug: d.slug as string | undefined,
+      title: d.title as string | undefined,
+      categories: d.categories as string[] | undefined,
+      metadata: d.metadata as CmsArticle["data"]["metadata"],
+      publishDate: d.publishDate as number | undefined,
+    },
+  };
 }
 
-export async function fetchArticleCategories(): Promise<string[]> {
+export const fetchArticleCategories = async (): Promise<string[]> => {
   try {
     const entries = await fetchEntries({
       model: "article",
       apiKey: BUILDER_API_KEY,
-      limit: 100,
+      options: { limit: 100, fields: "data.categories" },
       fetch: safeFetch,
     });
     const cats = new Set<string>();
     for (const entry of entries ?? []) {
-      for (const cat of (entry.data?.categories as string[] | undefined) ?? []) {
-        if (cat) cats.add(cat);
-      }
+      const categories = (entry.data as Record<string, unknown>)?.categories as string[] | undefined;
+      categories?.forEach((c) => cats.add(c));
     }
-    return [...cats].sort();
-  } catch {
+    return Array.from(cats).sort();
+  } catch (err) {
+    console.error("[fetchArticleCategories] threw", err);
     return [];
   }
-}
+};
+
+export const fetchArticles = async (limit = 5): Promise<CmsArticle[]> => {
+  try {
+    const entries = await fetchEntries({
+      model: "article",
+      apiKey: BUILDER_API_KEY,
+      options: { limit, sort: { "data.publishDate": -1 } },
+      fetch: safeFetch,
+    });
+    return (entries ?? []).map(entryToArticle);
+  } catch (err) {
+    console.error("[fetchArticles] threw", err);
+    return [];
+  }
+};
+
+export const searchArticles = async (
+  query: string,
+  category?: string | null
+): Promise<CmsArticle[]> => {
+  try {
+    const builtQuery: Record<string, unknown> = {};
+    if (query) builtQuery["data.title"] = { $regex: query, $options: "i" };
+    if (category) builtQuery["data.categories"] = category;
+
+    const entries = await fetchEntries({
+      model: "article",
+      apiKey: BUILDER_API_KEY,
+      query: builtQuery,
+      options: { limit: 5, sort: { "data.publishDate": -1 } },
+      fetch: safeFetch,
+    });
+    return (entries ?? []).map(entryToArticle);
+  } catch (err) {
+    console.error("[searchArticles] threw", err);
+    return [];
+  }
+};
