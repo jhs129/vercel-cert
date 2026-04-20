@@ -1,4 +1,4 @@
-import { fetchOneEntry, isPreviewing, getBuilderSearchParams } from "@builder.io/sdk-react";
+import { fetchOneEntry, fetchEntries, isPreviewing, getBuilderSearchParams } from "@builder.io/sdk-react";
 import { cache } from "react";
 
 export const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY ?? "";
@@ -63,4 +63,39 @@ export const getArticleContent = cache(
 
 export function buildUrlPath(page?: string[]): string {
   return "/" + (page?.join("/") ?? "");
+}
+
+export async function fetchArticles(limit = 5) {
+  try {
+    const entries = await fetchEntries({
+      model: "article",
+      apiKey: BUILDER_API_KEY,
+      limit,
+      sort: { "data.publishDate": -1 },
+      fetch: safeFetch,
+    });
+    return entries ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchArticleCategories(): Promise<string[]> {
+  try {
+    const entries = await fetchEntries({
+      model: "article",
+      apiKey: BUILDER_API_KEY,
+      limit: 100,
+      fetch: safeFetch,
+    });
+    const cats = new Set<string>();
+    for (const entry of entries ?? []) {
+      for (const cat of (entry.data?.categories as string[] | undefined) ?? []) {
+        if (cat) cats.add(cat);
+      }
+    }
+    return [...cats].sort();
+  } catch {
+    return [];
+  }
 }
