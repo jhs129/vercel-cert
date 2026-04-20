@@ -6,6 +6,9 @@
 @tailwind utilities;
 
 :root {
+  /* Layout */
+  --spacing-page-gutter: 1.25rem;
+
   /* Brand colors */
   --color-background: #ffffff;
   --color-foreground: #000000;
@@ -70,6 +73,9 @@
 }
 
 @theme inline {
+  /* Layout */
+  --spacing-page-gutter: var(--spacing-page-gutter);
+
   /* Colors */
   --color-background: var(--color-primary-light);
   --color-foreground: var(--color-primary-dark);

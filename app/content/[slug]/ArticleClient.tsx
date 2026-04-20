@@ -21,7 +21,7 @@ export function ArticleClient({
   if (!content && !isPreviewing()) return null;
 
   return (
-    <article className="max-w-3xl mx-auto px-4 py-8">
+    <article className="max-w-3xl mx-auto py-8">
       {heroImage && (
         <div className="w-full aspect-video mb-8 overflow-hidden rounded-lg">
           <img
