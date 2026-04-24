@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Content, isPreviewing } from "@builder.io/sdk-react";
 import type { BuilderContent } from "@builder.io/sdk-react";
+import { PaywallBanner } from "@/components/ui/PaywallBanner";
+import { useRouter } from "next/navigation";
 
 interface ArticleClientProps {
   content: BuilderContent | null;
@@ -9,6 +12,8 @@ interface ArticleClientProps {
   title: string;
   formattedDate: string | null;
   heroImage: string | undefined;
+  teaser: string;
+  initialSubscribed: boolean;
 }
 
 export function ArticleClient({
@@ -17,7 +22,26 @@ export function ArticleClient({
   title,
   formattedDate,
   heroImage,
+  teaser,
+  initialSubscribed,
 }: ArticleClientProps) {
+  const [subscribed, setSubscribed] = useState(initialSubscribed);
+  const router = useRouter();
+
+  if (!subscribed && !isPreviewing()) {
+    return (
+      <PaywallBanner
+        title={title}
+        heroImage={heroImage}
+        teaser={teaser}
+        onSubscribe={() => {
+          setSubscribed(true);
+          router.refresh();
+        }}
+      />
+    );
+  }
+
   if (!content && !isPreviewing()) return null;
 
   return (

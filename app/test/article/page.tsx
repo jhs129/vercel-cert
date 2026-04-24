@@ -25,6 +25,8 @@ export default function ArticleTestPage() {
             title="Breaking: Next.js 16 Ships with Turbopack by Default"
             formattedDate={formatDate(1745712000000)}
             heroImage="https://placehold.co/1200x630.png"
+            teaser="Modern web infrastructure is undergoing a fundamental shift."
+            initialSubscribed={true}
           />
         </div>
       </section>
@@ -38,6 +40,8 @@ export default function ArticleTestPage() {
             title="Edge Case: Article Without a Hero Image"
             formattedDate={formatDate(1745712000000)}
             heroImage={undefined}
+            teaser="An article without a hero image still renders correctly."
+            initialSubscribed={true}
           />
         </div>
       </section>
@@ -51,6 +55,8 @@ export default function ArticleTestPage() {
             title="Edge Case: No Date or Hero"
             formattedDate={null}
             heroImage={undefined}
+            teaser="An article with no date or hero image."
+            initialSubscribed={true}
           />
         </div>
       </section>

@@ -2,6 +2,7 @@ import { isPreviewing } from "@builder.io/sdk-react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { BUILDER_API_KEY, getArticleContent } from "@/lib/builder";
+import { isSubscribedServer } from "@/lib/subscription.server";
 import { ArticleClient } from "./ArticleClient";
 
 const DEFAULT_TITLE = "Article";
@@ -53,7 +54,10 @@ export default async function ArticlePage({
   const resolvedSearchParams = await searchParams;
 
   const previewing = isPreviewing(resolvedSearchParams);
-  const content = await getArticleContent(slug, resolvedSearchParams);
+  const [content, subscribed] = await Promise.all([
+    getArticleContent(slug, resolvedSearchParams),
+    isSubscribedServer(),
+  ]);
 
   if (!content && !previewing) {
     notFound();
@@ -63,6 +67,7 @@ export default async function ArticlePage({
   const publishDate = content?.data?.publishDate as number | undefined;
   const meta = content?.data?.metadata as Record<string, unknown> | undefined;
   const heroImage = meta?.media as string | undefined;
+  const teaser = ((meta?.description as string | undefined) ?? "").slice(0, 255);
 
   const formattedDate = publishDate
     ? new Date(publishDate).toLocaleDateString("en-US", {
@@ -75,11 +80,13 @@ export default async function ArticlePage({
 
   return (
     <ArticleClient
-      content={content}
+      content={subscribed || previewing ? content : null}
       apiKey={BUILDER_API_KEY}
       title={title}
       formattedDate={formattedDate}
       heroImage={heroImage}
+      teaser={teaser}
+      initialSubscribed={subscribed}
     />
   );
 }
