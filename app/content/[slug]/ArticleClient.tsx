@@ -28,9 +28,7 @@ export function ArticleClient({
   const [subscribed, setSubscribed] = useState(initialSubscribed);
   const router = useRouter();
 
-  if (!content && !isPreviewing()) return null;
-
-  if (!subscribed) {
+  if (!subscribed && !isPreviewing()) {
     return (
       <PaywallBanner
         title={title}
@@ -43,6 +41,8 @@ export function ArticleClient({
       />
     );
   }
+
+  if (!content && !isPreviewing()) return null;
 
   return (
     <article className="max-w-3xl mx-auto py-8">
