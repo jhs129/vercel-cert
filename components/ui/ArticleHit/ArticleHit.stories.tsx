@@ -17,7 +17,7 @@ type Story = StoryObj<typeof ArticleHit>;
 export const Default: Story = {
   args: {
     title: "Article Title",
-    slug: "/hello-world",
+    slug: "hello-world",
   },
 };
 
@@ -25,13 +25,16 @@ export const LongTitle: Story = {
   args: {
     title:
       "This Is a Much Longer Article Title That Might Wrap to Multiple Lines in Narrow Containers",
-    slug: "/hello-world",
+    slug: "long-title-article",
   },
 };
 
-export const ExternalLink: Story = {
-  args: {
-    title: "External Article",
-    slug: "/hello-world",
-  },
+export const MultipleResults: Story = {
+  render: () => (
+    <div className="flex flex-col gap-3">
+      <ArticleHit title="Introduction to TypeScript" slug="intro-to-typescript" />
+      <ArticleHit title="React Server Components Explained" slug="react-server-components" />
+      <ArticleHit title="Tailwind CSS Best Practices" slug="tailwind-css-best-practices" />
+    </div>
+  ),
 };

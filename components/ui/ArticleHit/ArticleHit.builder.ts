@@ -17,7 +17,7 @@ export const ArticleHitRegistration: RegisteredComponent = {
       type: "string",
       required: true,
       defaultValue: "hello-world",
-      helperText: "The URL the article title links to",
+      helperText: "URL slug appended to /content/ (e.g. 'my-article' → /content/my-article)",
     },
   ],
 };
