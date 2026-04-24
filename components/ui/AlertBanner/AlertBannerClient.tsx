@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { DismissButton } from "@/components/ui/Alert/DismissButton";
 import type { AlertVariant } from "@/components/ui/Alert";
@@ -27,7 +27,12 @@ function setDismissCookie(id: string) {
 }
 
 export function AlertBannerClient({ alerts }: AlertBannerClientProps) {
-  const [dismissed, setDismissed] = useState<Set<string>>(getDismissedIds);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDismissed(getDismissedIds());
+  }, []);
 
   function dismiss(id: string) {
     setDismissCookie(id);
