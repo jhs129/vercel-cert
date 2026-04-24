@@ -2,7 +2,7 @@ import { isPreviewing } from "@builder.io/sdk-react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { BUILDER_API_KEY, getArticleContent } from "@/lib/builder";
-import { isSubscribedServer } from "@/lib/subscription";
+import { isSubscribedServer } from "@/lib/subscription.server";
 import { ArticleClient } from "./ArticleClient";
 
 const DEFAULT_TITLE = "Article";
