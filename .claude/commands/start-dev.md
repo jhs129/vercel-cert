@@ -54,9 +54,16 @@ Do this for all tickets before creating any worktrees.
 
 ## Step 3: Process Each Ticket
 
-If multiple tickets: dispatch one parallel agent per ticket (using the superpowers dispatching pattern). Each agent handles steps 4–9 for its assigned ticket independently.
+**Single ticket:** Perform Steps 4–9 directly in this session.
 
-If a single ticket: perform steps 4–9 directly.
+**Multiple tickets:** Invoke `superpowers:dispatching-parallel-agents`. Dispatch one subagent per ticket. Each subagent prompt must include:
+- The specific ticket key
+- The Atlassian cloud ID (from Step 1)
+- The Vercel project name: `vercel-cert`
+- The main repo root path (use `git rev-parse --show-toplevel` if needed)
+- The complete instructions from Steps 4–9 of this document, verbatim
+
+Wait for all subagents to complete, then display the Step 10 Summary with collated results.
 
 ---
 
@@ -145,7 +152,7 @@ From inside the worktree, run the pull-request workflow:
 - The branch name already follows the Jira ticket naming convention, so the workflow auto-detects the ticket key
 - The workflow will: verify the build, create the test page (if a UI component), bump the version, push the branch, create the PR, detect the Vercel preview deployment URL, and post the PR + deployment + test page links to the Jira ticket
 
-Follow all steps in `.claude/commands/pull-request.md`.
+Follow all steps in `.claude/commands/pr.md`.
 
 ---
 
