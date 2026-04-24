@@ -25,30 +25,35 @@ export function ArticleClient({
   teaser,
   initialSubscribed,
 }: ArticleClientProps) {
-  const [subscribed, setSubscribed] = useState(initialSubscribed);
+  // Tracks the window between clicking Subscribe and the server refresh delivering content.
+  // Avoids stale-state bugs by deriving paywall visibility from the server prop (initialSubscribed)
+  // rather than maintaining a duplicate subscribed state that can drift.
+  const [subscribePending, setSubscribePending] = useState(false);
   const router = useRouter();
 
-  if (!subscribed && !isPreviewing()) {
-    return (
-      <PaywallBanner
-        title={title}
-        heroImage={heroImage}
-        teaser={teaser}
-        onSubscribe={() => {
-          setSubscribed(true);
-          router.refresh();
-        }}
-      />
-    );
-  }
-
-  if (!content && !isPreviewing()) {
+  if (subscribePending && !content && !isPreviewing()) {
     return (
       <div className="max-w-3xl mx-auto py-8 flex items-center justify-center min-h-[50vh]">
         <p className="text-muted">Loading article…</p>
       </div>
     );
   }
+
+  if (!initialSubscribed && !content && !isPreviewing()) {
+    return (
+      <PaywallBanner
+        title={title}
+        heroImage={heroImage}
+        teaser={teaser}
+        onSubscribe={() => {
+          setSubscribePending(true);
+          router.refresh();
+        }}
+      />
+    );
+  }
+
+  if (!content && !isPreviewing()) return null;
 
   return (
     <article className="max-w-3xl mx-auto py-8">
