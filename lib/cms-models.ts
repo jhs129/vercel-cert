@@ -3,7 +3,7 @@ export interface CmsContent {
   name: string;
   published: string;
   data: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 

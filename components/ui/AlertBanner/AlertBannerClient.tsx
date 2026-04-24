@@ -30,6 +30,7 @@ export function AlertBannerClient({ alerts }: AlertBannerClientProps) {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDismissed(getDismissedIds());
   }, []);
 

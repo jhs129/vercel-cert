@@ -74,7 +74,25 @@ export default function SearchPageClient({
 
   // Fire initial search if a query was provided via URL
   useEffect(() => {
-    if (initialQuery) executeSearch(initialQuery, initialCategory);
+    if (!initialQuery) return;
+    const controller = new AbortController();
+    abortRef.current = controller;
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/search?q=${encodeURIComponent(initialQuery)}&category=${encodeURIComponent(initialCategory ?? "")}`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) throw new Error("search failed");
+        const data: CmsArticle[] = await res.json();
+        if (!controller.signal.aborted) setResults(data);
+      } catch (err: unknown) {
+        if ((err as Error)?.name !== "AbortError") setResults([]);
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
+      }
+    })();
+    return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -82,7 +82,7 @@ Fix any build or lint errors. Do not proceed if the build fails.
 
 ### Step 5B: Create the Pull Request
 
-Follow all steps in `.claude/commands/pull-request.md`.
+Follow all steps in `.claude/commands/pr.md`.
 
 The workflow will:
 - Detect Vercel preview deployment

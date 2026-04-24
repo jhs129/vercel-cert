@@ -37,9 +37,19 @@ If no tickets are found, report "No tickets in Grooming" and stop.
 
 ---
 
-## Step 2: Process Each Ticket
+## Step 2: Process Tickets
 
-For each ticket, perform steps 3–7. If processing multiple tickets, work through them sequentially.
+**Single ticket:** Proceed directly to Steps 3–7 in this session.
+
+**Multiple tickets:** Invoke `superpowers:dispatching-parallel-agents`. Dispatch one subagent per ticket simultaneously. Each subagent prompt must include:
+- The specific ticket key to groom
+- The Atlassian cloud ID (obtained in Step 1)
+- The complete instructions from Steps 3–7 of this document, verbatim
+- Jira base URL: `https://jhsdc.atlassian.net/browse/`
+- Project key: `VS`
+- Cloud ID: `c546b8b8-c5e9-4677-8322-7a935c3d3860`
+
+Wait for all subagents to complete. Collect each subagent's result (ticket key, final status, assumption count, question count, AC count) for the Step 8 Summary.
 
 ---
 
