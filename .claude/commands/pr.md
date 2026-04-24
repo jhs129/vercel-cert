@@ -104,7 +104,43 @@ The test page will be available at `<vercel-preview-url>/test/<component-slug>` 
 
 ---
 
-## Step 5: Determine the Next PR Number and Update the Version
+## Step 5: Code Review
+
+Get all changes on this branch:
+```bash
+git diff main...HEAD --name-only
+git diff main...HEAD
+```
+
+Dispatch a `pr-review-toolkit:code-reviewer` subagent. Pass it:
+- The full output of `git diff main...HEAD`
+- The changed file list from `git diff main...HEAD --name-only`
+- This context: "Next.js 16 App Router project. Key conventions in CLAUDE.md: use Tailwind CSS tokens (never hardcode hex or arbitrary `bg-[#xxx]`), server/client split pattern (`page.tsx` → `*Client.tsx`), Builder.io must use `@builder.io/sdk-react` only (never `@builder.io/react`), components >100 lines split into directory `components/[Name]/index.tsx`."
+
+**If no blockers found:** Proceed to Step 6.
+
+**If blockers found:**
+1. Fix every issue that can be resolved without human judgment: naming, style, missing error handling, CLAUDE.md convention violations, type issues.
+2. Run: `pnpm build && pnpm lint` — fix any errors before continuing.
+3. Re-dispatch the `pr-review-toolkit:code-reviewer` subagent on the updated diff.
+4. If clean → proceed to Step 6.
+5. If questions remain that require human judgment:
+   - If a Jira ticket was found in Step 2:
+     ```
+     getTransitionsForJiraIssue(cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860", issueIdOrKey="<ticket-key>")
+     transitionJiraIssue(cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860", issueIdOrKey="<ticket-key>", transitionId="<blocked-id>")
+     addCommentToJiraIssue(
+       cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860",
+       issueIdOrKey="<ticket-key>",
+       contentFormat="markdown",
+       commentBody="**Code review blocked PR creation.**\n\n**Issues fixed automatically:**\n- <list each fix>\n\n**Unresolved — human input needed:**\n- <list each remaining issue with a specific question>\n\nPlease address these and re-run `/pr`."
+     )
+     ```
+   - **Stop.** Do not push or create a PR.
+
+---
+
+## Step 6: Determine the Next PR Number and Update the Version
 
 Get the highest existing PR number to predict the next one:
 ```bash
@@ -128,7 +164,7 @@ git commit -m "chore: bump version for PR #<number>"
 
 ---
 
-## Step 6: Push the Branch
+## Step 7: Push the Branch
 
 ```bash
 git push -u origin <branch-name>
@@ -136,7 +172,7 @@ git push -u origin <branch-name>
 
 ---
 
-## Step 7: Detect the Vercel Preview Deployment
+## Step 8: Detect the Vercel Preview Deployment
 
 After pushing, Vercel automatically triggers a preview deployment. Poll for it using the Vercel MCP:
 
@@ -162,7 +198,7 @@ If detection times out or fails, note the failure in the PR and Jira comment but
 
 ---
 
-## Step 8: Build the PR Title and Body
+## Step 9: Build the PR Title and Body
 
 **Title:** Use the Jira ticket summary if available, otherwise derive a concise title (under 70 chars) from the branch slug and git log.
 
@@ -196,7 +232,7 @@ Structure:
 
 ---
 
-## Step 9: Create the PR
+## Step 10: Create the PR
 
 ```bash
 gh pr create --title "<title>" --body "$(cat <<'EOF'
@@ -209,7 +245,7 @@ Use `--base main` if the base branch is not automatically detected correctly.
 
 ---
 
-## Step 10: Update the Jira Ticket (if applicable)
+## Step 11: Update the Jira Ticket (if applicable)
 
 If a Jira ticket was found:
 
@@ -283,7 +319,7 @@ addCommentToJiraIssue(
 
 ---
 
-## Step 11: Show the Result
+## Step 12: Show the Result
 
 ```
 ✅ Pull request created
