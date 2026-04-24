@@ -1,5 +1,19 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git push*)",
+            "command": "cd /Users/johnhschneider/dev/vercel-cert && pnpm build && pnpm lint",
+            "statusMessage": "Enforcing build + lint before push...",
+            "asyncRewake": true
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Bash",
