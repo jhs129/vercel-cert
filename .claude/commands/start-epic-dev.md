@@ -186,31 +186,66 @@ Fix all errors before proceeding. Do not create a PR with a failing build.
 
 ---
 
-## Step 7: Create the Pull Request
+## Step 7: Code Review
 
-**Determine the next PR number:**
+Get all changes on this branch:
+```bash
+git diff main...HEAD --name-only
+git diff main...HEAD
+```
+
+Dispatch a `pr-review-toolkit:code-reviewer` subagent. Pass it:
+- The full output of `git diff main...HEAD`
+- The changed file list
+- Context: "Next.js 16 App Router project. See CLAUDE.md for conventions: Tailwind tokens, server/client split, Builder.io uses `@builder.io/sdk-react` only, components >100 lines split into directory."
+
+**If no blockers found:** Proceed to Step 8.
+
+**If blockers found:**
+1. Fix every issue resolvable without human judgment.
+2. Run `pnpm build && pnpm lint`.
+3. Re-dispatch the reviewer on the updated diff.
+4. If clean → proceed to Step 8.
+5. If unresolved questions remain:
+   - Transition the **epic** Jira ticket to Blocked:
+     ```
+     getTransitionsForJiraIssue(cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860", issueIdOrKey="$ARGUMENTS")
+     transitionJiraIssue(cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860", issueIdOrKey="$ARGUMENTS", transitionId="<blocked-id>")
+     addCommentToJiraIssue(
+       cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860",
+       issueIdOrKey="$ARGUMENTS",
+       contentFormat="markdown",
+       commentBody="**Code review blocked PR creation.**\n\n**Issues fixed automatically:**\n- <list>\n\n**Unresolved — human input needed:**\n- <list with specific questions>\n\nPlease address these and re-run `/start-epic-dev $ARGUMENTS`."
+     )
+     ```
+   - **Stop.** Do not create a PR.
+
+---
+
+## Step 8: Create the Pull Request
+
+**Determine the next PR number** (same pattern as `pr.md` Step 6):
 ```bash
 gh pr list --state all --limit 1 --json number --jq '.[0].number'
 ```
-Next PR = that number + 1. Update `package.json` version: keep `MAJOR.MINOR.`, set patch to the PR number.
-
+Next PR = that number + 1. Update `package.json`: keep `MAJOR.MINOR.`, set patch to the PR number.
 ```bash
 git add package.json
 git commit -m "chore: bump version for PR #<number>"
 ```
 
-**Push the branch:**
+**Push the branch** (same as `pr.md` Step 7):
 ```bash
 git push -u origin <branch-name>
 ```
 
-**Detect the Vercel preview deployment** (poll up to 3 minutes, 30-second intervals):
+**Detect the Vercel preview deployment** (same as `pr.md` Step 8 — poll up to 3 minutes, 30-second intervals):
 ```
 list_deployments(projectId="vercel-cert", target="preview", gitBranch="<branch-name>", limit=1)
 get_deployment(deploymentId="<id>")
 ```
 
-**Build the PR body** — write in first person as John Schneider, direct and friendly, not AI-generated sounding.
+**Build the PR body** — write in first person as John Schneider, direct and friendly.
 
 Structure:
 ```
@@ -223,7 +258,6 @@ Structure:
 | Ticket | Summary |
 |--------|---------|
 | [<KEY>](https://jhsdc.atlassian.net/browse/<KEY>) | <summary> |
-| ... | ... |
 
 **Preview:** <deployment-url>
 
@@ -237,7 +271,6 @@ Structure:
 - [ ] Visit `<deployment-url>/test/<component-slug>` — verify all variants render correctly
 - [ ] Verify equal-height alignment in multi-card stories (if applicable)
 - [ ] Accessibility: run Storybook a11y addon on all new component stories
-- [ ] <additional checks from AC>
 
 🤖 Generated with [Claude Code](https://claude.ai/claude-code)
 ```
@@ -252,7 +285,7 @@ EOF
 
 ---
 
-## Step 8: Update All Jira Stories
+## Step 9: Update All Jira Stories
 
 For **each** Dev Ready story that was implemented:
 
@@ -270,7 +303,7 @@ editJiraIssue(cloudId="...", issueIdOrKey="<key>", fields={"assignee": {"account
 
 ---
 
-## Step 9: Update the Epic in Jira
+## Step 10: Update the Epic in Jira
 
 **a) Transition the epic to "In Review":**
 ```
@@ -300,7 +333,7 @@ Primary route: <deployment-url>/<route>  (if applicable)
 
 ---
 
-## Step 10: Summary
+## Step 11: Summary
 
 ```
 ✅ Epic development complete
