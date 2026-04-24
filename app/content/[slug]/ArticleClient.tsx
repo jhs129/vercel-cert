@@ -42,7 +42,13 @@ export function ArticleClient({
     );
   }
 
-  if (!content && !isPreviewing()) return null;
+  if (!content && !isPreviewing()) {
+    return (
+      <div className="max-w-3xl mx-auto py-8 flex items-center justify-center min-h-[50vh]">
+        <p className="text-muted">Loading article…</p>
+      </div>
+    );
+  }
 
   return (
     <article className="max-w-3xl mx-auto py-8">
