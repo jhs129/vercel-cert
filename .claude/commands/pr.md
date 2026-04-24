@@ -136,7 +136,8 @@ Dispatch a `pr-review-toolkit:code-reviewer` subagent. Pass it:
        commentBody="**Code review blocked PR creation.**\n\n**Issues fixed automatically:**\n- <list each fix>\n\n**Unresolved — human input needed:**\n- <list each remaining issue with a specific question>\n\nPlease address these and re-run `/pr`."
      )
      ```
-   - **Stop.** Do not push or create a PR.
+
+   **Stop.** Do not push or create a PR.
 
 ---
 
