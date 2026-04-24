@@ -67,24 +67,22 @@ Child stories (<count> total):
 
 ---
 
-## Step 3: Groom Each Story
+## Step 3: Groom Stories in Parallel
 
-For each child story, invoke the `/groom` skill passing the story key as the argument. Before each invocation, output a progress header:
+Filter child stories to only those in **To Do** or **Grooming** status. Stories already in Requirements Review, Dev Ready, In Progress, In Review, or Done are skipped — note them in the Step 4 summary as "skipped — already past Grooming."
 
-```
----
-Grooming <KEY> (<n> of <total>): <summary>
----
-```
+If no stories remain after filtering, report and stop.
 
-Then invoke:
-```
-Skill("groom", args="<KEY>")
-```
+Invoke `superpowers:dispatching-parallel-agents`. Dispatch one subagent per eligible story. Each subagent prompt must include:
 
-The epic description is already in your context — use it to inform each story's grooming. When drafting assumptions and acceptance criteria for a story, make sure they are consistent with the epic's stated goal and scope. Note any story that appears to conflict with the epic description and flag it in that story's grooming comment.
+1. The specific story key (e.g., `VS-12`)
+2. The Atlassian cloud ID: `c546b8b8-c5e9-4677-8322-7a935c3d3860`
+3. The epic description (copy it verbatim from Step 1 output) — the subagent must use this to ensure the story's AC is consistent with the epic goal. Any story that appears to conflict with the epic must have the conflict flagged in its grooming Jira comment.
+4. The complete grooming instructions (Steps 3–7 from `.claude/commands/groom.md`), verbatim
+5. Jira base URL: `https://jhsdc.atlassian.net/browse/`
+6. Project key: `VS`
 
-Continue through all stories sequentially. Do not stop early unless a story errors out — if one fails, note the failure and continue to the next.
+Wait for all subagents to complete. Collect each result (story key, final status, error if any) for the Step 4 Summary.
 
 ---
 
