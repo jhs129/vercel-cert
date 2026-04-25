@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Content, isPreviewing } from "@builder.io/sdk-react";
+import dynamic from "next/dynamic";
+import { isPreviewing } from "@builder.io/sdk-react";
 import type { BuilderContent } from "@builder.io/sdk-react";
 import { PaywallBanner } from "@/components/ui/PaywallBanner";
 import { useRouter } from "next/navigation";
+
+// Load Builder.io Content client-side only to prevent its inline <script> tag
+// from appearing in SSR output, which triggers a React 19 console error.
+const ArticleContent = dynamic(() => import("./ArticleContent"), { ssr: false });
 
 interface ArticleClientProps {
   content: BuilderContent | null;
@@ -77,7 +82,7 @@ export function ArticleClient({
       </header>
 
       <div className="prose max-w-none">
-        <Content
+        <ArticleContent
           model="article"
           content={content}
           apiKey={apiKey}
