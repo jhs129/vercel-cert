@@ -87,7 +87,7 @@ async function upsertArticle(
 
   const body = {
     name: item.title,
-    published: "draft",
+    published: "published",
     data: {
       slug: item.slug,
       title: item.title,
@@ -97,16 +97,16 @@ async function upsertArticle(
         description: item.description.slice(0, 255),
         media: PLACEHOLDER_IMAGE,
       },
-    },
-    blocks: [
-      {
-        "@type": "@builder.io/sdk:Element",
-        component: {
-          name: "Text",
-          options: { text: `<p>${item.description}</p>` },
+      blocks: [
+        {
+          "@type": "@builder.io/sdk:Element",
+          component: {
+            name: "Text",
+            options: { text: `<p>${item.description}</p>` },
+          },
         },
-      },
-    ],
+      ],
+    },
   };
 
   if (existingId) {
