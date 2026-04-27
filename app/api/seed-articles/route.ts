@@ -2,17 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 const PRIVATE_KEY = process.env.BUILDER_PRIVATE_KEY ?? "";
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY ?? "";
-const SEED_ADMIN_TOKEN = process.env.SEED_ADMIN_TOKEN ?? "";
-
 function checkAuth(request: NextRequest): Response | null {
   if (process.env.VERCEL_ENV === "production") {
     return NextResponse.json({ error: "Not available in production" }, { status: 404 });
   }
-  if (!SEED_ADMIN_TOKEN) {
-    return NextResponse.json({ error: "SEED_ADMIN_TOKEN is not set" }, { status: 500 });
+  if (!PRIVATE_KEY) {
+    return NextResponse.json({ error: "BUILDER_PRIVATE_KEY is not set" }, { status: 500 });
   }
   const auth = request.headers.get("authorization");
-  if (auth !== `Bearer ${SEED_ADMIN_TOKEN}`) {
+  if (auth !== `Bearer ${PRIVATE_KEY}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   return null;
