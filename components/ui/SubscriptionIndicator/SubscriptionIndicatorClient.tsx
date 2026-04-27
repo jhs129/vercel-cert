@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { subscribeCookie, unsubscribeCookie } from "@/lib/subscription";
 
 interface SubscriptionIndicatorClientProps {
@@ -9,15 +10,18 @@ interface SubscriptionIndicatorClientProps {
 
 export function SubscriptionIndicatorClient({ initialSubscribed }: SubscriptionIndicatorClientProps) {
   const [subscribed, setSubscribed] = useState(initialSubscribed);
+  const router = useRouter();
 
   function handleSubscribe() {
     subscribeCookie();
     setSubscribed(true);
+    router.refresh();
   }
 
   function handleUnsubscribe() {
     unsubscribeCookie();
     setSubscribed(false);
+    router.refresh();
   }
 
   if (subscribed) {

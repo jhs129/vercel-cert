@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Content, isPreviewing } from "@builder.io/sdk-react";
+import dynamic from "next/dynamic";
+import { isPreviewing } from "@builder.io/sdk-react";
 import type { BuilderContent } from "@builder.io/sdk-react";
 import { PaywallBanner } from "@/components/ui/PaywallBanner";
 import { useRouter } from "next/navigation";
+
+// Load Builder.io Content client-side only to prevent its inline <script> tag
+// from appearing in SSR output, which triggers a React 19 console error.
+const ArticleContent = dynamic(() => import("./ArticleContent"), { ssr: false });
 
 interface ArticleClientProps {
   content: BuilderContent | null;
@@ -25,17 +30,28 @@ export function ArticleClient({
   teaser,
   initialSubscribed,
 }: ArticleClientProps) {
-  const [subscribed, setSubscribed] = useState(initialSubscribed);
+  // Tracks the window between clicking Subscribe and the server refresh delivering content.
+  // Avoids stale-state bugs by deriving paywall visibility from the server prop (initialSubscribed)
+  // rather than maintaining a duplicate subscribed state that can drift.
+  const [subscribePending, setSubscribePending] = useState(false);
   const router = useRouter();
 
-  if (!subscribed && !isPreviewing()) {
+  if (subscribePending && !content && !isPreviewing()) {
+    return (
+      <div className="max-w-3xl mx-auto py-8 flex items-center justify-center min-h-[50vh]">
+        <p className="text-muted">Loading article…</p>
+      </div>
+    );
+  }
+
+  if (!initialSubscribed && !content && !isPreviewing()) {
     return (
       <PaywallBanner
         title={title}
         heroImage={heroImage}
         teaser={teaser}
         onSubscribe={() => {
-          setSubscribed(true);
+          setSubscribePending(true);
           router.refresh();
         }}
       />
@@ -66,7 +82,7 @@ export function ArticleClient({
       </header>
 
       <div className="prose max-w-none">
-        <Content
+        <ArticleContent
           model="article"
           content={content}
           apiKey={apiKey}
