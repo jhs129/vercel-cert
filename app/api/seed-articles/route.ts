@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 
 const PRIVATE_KEY = process.env.BUILDER_PRIVATE_KEY ?? "";
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY ?? "";
+const SEED_ADMIN_TOKEN = process.env.SEED_ADMIN_TOKEN ?? "";
+
+function checkAuth(request: NextRequest): Response | null {
+  if (process.env.VERCEL_ENV === "production") {
+    return NextResponse.json({ error: "Not available in production" }, { status: 404 });
+  }
+  if (!SEED_ADMIN_TOKEN) {
+    return NextResponse.json({ error: "SEED_ADMIN_TOKEN is not set" }, { status: 500 });
+  }
+  const auth = request.headers.get("authorization");
+  if (auth !== `Bearer ${SEED_ADMIN_TOKEN}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return null;
+}
 const WRITE_API = "https://builder.io/api/v1/write";
 const CONTENT_API = "https://cdn.builder.io/api/v3/content";
 const BLOG_RSS = "https://vercel.com/blog/rss.xml";
@@ -104,6 +119,9 @@ async function upsertArticle(
 }
 
 export async function POST(request: NextRequest) {
+  const authError = checkAuth(request);
+  if (authError) return authError;
+
   if (!PRIVATE_KEY) {
     return NextResponse.json({ error: "BUILDER_PRIVATE_KEY is not set" }, { status: 500 });
   }
@@ -136,7 +154,10 @@ export async function POST(request: NextRequest) {
   });
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  const authError = checkAuth(request);
+  if (authError) return authError;
+
   if (!PRIVATE_KEY) {
     return NextResponse.json({ error: "BUILDER_PRIVATE_KEY is not set" }, { status: 500 });
   }
