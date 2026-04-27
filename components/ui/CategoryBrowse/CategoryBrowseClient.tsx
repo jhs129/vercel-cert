@@ -13,13 +13,20 @@ import type { Themeable } from "@/lib/types";
 const PAGE_SIZE = 10;
 const MAX_ARTICLES = 100;
 
+interface CategoryItem {
+  label: string;
+  value: string;
+}
+
 interface CategoryBrowseClientProps extends Themeable {
   title?: string;
+  categories?: CategoryItem[];
 }
 
 export default function CategoryBrowseClient({
   title = "Browse Articles",
   theme = "light",
+  categories: categoriesProp,
 }: CategoryBrowseClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -37,14 +44,23 @@ export default function CategoryBrowseClient({
   }, [activeCategory]);
 
   useEffect(() => {
-    Promise.all([fetchArticles(MAX_ARTICLES), fetchArticleCategories()])
+    const configuredCategories = Array.isArray(categoriesProp)
+      ? categoriesProp.filter((c) => c.value !== "all").map((c) => c.value)
+      : [];
+
+    Promise.all([
+      fetchArticles(MAX_ARTICLES),
+      configuredCategories && configuredCategories.length > 0
+        ? Promise.resolve(configuredCategories)
+        : fetchArticleCategories(),
+    ])
       .then(([arts, cats]) => {
         setArticles(arts);
         setCategories(cats);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
-  }, []);
+  }, []); // categoriesProp is a CMS-set prop, stable at mount
 
   const handleCategoryChange = (cat: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
