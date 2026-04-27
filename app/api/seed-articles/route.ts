@@ -87,7 +87,7 @@ async function upsertArticle(
 
   const body = {
     name: item.title,
-    published: "published",
+    published: "draft",
     data: {
       slug: item.slug,
       title: item.title,
