@@ -20,11 +20,20 @@ const CONTENT_API = "https://cdn.builder.io/api/v3/content";
 const BLOG_BASE = "https://vercel.com/blog";
 const PLACEHOLDER_IMAGE = "https://placehold.co/1200x630.png";
 
+interface BuilderBlock {
+  "@type": "@builder.io/sdk:Element";
+  component: {
+    name: string;
+    options: Record<string, unknown>;
+  };
+}
+
 interface ArticleItem {
   slug: string;
   title: string;
   description: string;
   publishDate: number;
+  blocks: BuilderBlock[];
 }
 
 function extractMeta(html: string, property: string): string {
@@ -56,16 +65,61 @@ async function fetchBlogSlugs(limit: number): Promise<string[]> {
   return slugs;
 }
 
+function markdownToBlocks(markdown: string): BuilderBlock[] {
+  const blocks: BuilderBlock[] = [];
+  // Remove front matter if present
+  const body = markdown.replace(/^---[\s\S]*?---\n?/, "").trim();
+
+  for (const line of body.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    if (trimmed.startsWith("# ")) {
+      blocks.push({ "@type": "@builder.io/sdk:Element", component: { name: "Text", options: { text: `<h1>${trimmed.slice(2)}</h1>` } } });
+    } else if (trimmed.startsWith("## ")) {
+      blocks.push({ "@type": "@builder.io/sdk:Element", component: { name: "Text", options: { text: `<h2>${trimmed.slice(3)}</h2>` } } });
+    } else if (trimmed.startsWith("### ")) {
+      blocks.push({ "@type": "@builder.io/sdk:Element", component: { name: "Text", options: { text: `<h3>${trimmed.slice(4)}</h3>` } } });
+    } else if (trimmed.startsWith("![")) {
+      // skip image embeds
+    } else if (trimmed.startsWith(">")) {
+      blocks.push({ "@type": "@builder.io/sdk:Element", component: { name: "Text", options: { text: `<blockquote>${trimmed.slice(1).trim()}</blockquote>` } } });
+    } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+      blocks.push({ "@type": "@builder.io/sdk:Element", component: { name: "Text", options: { text: `<p>${trimmed.slice(2)}</p>` } } });
+    } else if (/^\d+\. /.test(trimmed)) {
+      blocks.push({ "@type": "@builder.io/sdk:Element", component: { name: "Text", options: { text: `<p>${trimmed.replace(/^\d+\. /, "")}</p>` } } });
+    } else if (!trimmed.startsWith("```") && !trimmed.startsWith("|")) {
+      blocks.push({ "@type": "@builder.io/sdk:Element", component: { name: "Text", options: { text: `<p>${trimmed}</p>` } } });
+    }
+  }
+
+  return blocks.length ? blocks : [];
+}
+
 async function fetchArticleMeta(slug: string, index: number, total: number): Promise<ArticleItem> {
-  const res = await fetch(`${BLOG_BASE}/${slug}`, { cache: "no-store" });
-  const html = res.ok ? await res.text() : "";
+  const url = `${BLOG_BASE}/${slug}`;
+  // Fetch HTML for meta tags and markdown for body content in parallel
+  const [htmlRes, mdRes] = await Promise.all([
+    fetch(url, { cache: "no-store" }),
+    fetch(url, { cache: "no-store", headers: { Accept: "text/markdown" } }),
+  ]);
+
+  const html = htmlRes.ok ? await htmlRes.text() : "";
+  const markdown = mdRes.ok ? await mdRes.text() : "";
+
   const title = extractTitle(html) || slug;
   const description = extractMeta(html, "og:description") || extractMeta(html, "description") || "";
+
+  const blocks = markdown ? markdownToBlocks(markdown) : [
+    { "@type": "@builder.io/sdk:Element" as const, component: { name: "Text", options: { text: `<p>${description}</p>` } } },
+  ];
+
   // Spread publish dates evenly across the last 18 months
   const now = Date.now();
   const eighteenMonthsAgo = now - 18 * 30 * 24 * 60 * 60 * 1000;
   const publishDate = Math.round(eighteenMonthsAgo + (index / Math.max(total - 1, 1)) * (now - eighteenMonthsAgo));
-  return { slug, title, description, publishDate };
+
+  return { slug, title, description, publishDate, blocks };
 }
 
 async function findExistingArticle(slug: string): Promise<string | null> {
@@ -97,15 +151,7 @@ async function upsertArticle(
         description: item.description.slice(0, 255),
         media: PLACEHOLDER_IMAGE,
       },
-      blocks: [
-        {
-          "@type": "@builder.io/sdk:Element",
-          component: {
-            name: "Text",
-            options: { text: `<p>${item.description}</p>` },
-          },
-        },
-      ],
+      blocks: item.blocks,
     },
   };
 
