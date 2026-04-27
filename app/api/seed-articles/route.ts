@@ -17,37 +17,55 @@ function checkAuth(request: NextRequest): Response | null {
 }
 const WRITE_API = "https://builder.io/api/v1/write";
 const CONTENT_API = "https://cdn.builder.io/api/v3/content";
-const BLOG_RSS = "https://vercel.com/blog/rss.xml";
+const BLOG_BASE = "https://vercel.com/blog";
 const PLACEHOLDER_IMAGE = "https://placehold.co/1200x630.png";
 
-interface RssItem {
+interface ArticleItem {
   slug: string;
   title: string;
   description: string;
   publishDate: number;
 }
 
-function extractTag(xml: string, tag: string): string {
-  const match = xml.match(
-    new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, "i")
-  );
+function extractMeta(html: string, property: string): string {
+  const match = html.match(new RegExp(`<meta[^>]+(?:property|name)="${property}"[^>]+content="([^"]*)"`, "i"))
+    ?? html.match(new RegExp(`<meta[^>]+content="([^"]*)"[^>]+(?:property|name)="${property}"`, "i"));
   return match?.[1]?.trim() ?? "";
 }
 
-function parseRssItems(xml: string, limit: number): RssItem[] {
-  const itemBlocks = xml.match(/<item>([\s\S]*?)<\/item>/gi) ?? [];
-  return itemBlocks
-    .slice(0, limit)
-    .map((block) => {
-      const link = extractTag(block, "link");
-      const slug = link.replace(/^https:\/\/vercel\.com\/blog\//, "").replace(/\/+$/, "");
-      const title = extractTag(block, "title");
-      const rawDescription = extractTag(block, "description").replace(/<[^>]+>/g, "").trim();
-      const pubDateStr = extractTag(block, "pubDate");
-      const publishDate = pubDateStr ? new Date(pubDateStr).getTime() : Date.now();
-      return { slug, title, description: rawDescription, publishDate };
-    })
-    .filter((item) => item.slug && item.title);
+function extractTitle(html: string): string {
+  const og = extractMeta(html, "og:title");
+  if (og) return og.replace(/\s*[-–|]\s*Vercel.*$/i, "").trim();
+  const match = html.match(/<title>([^<]*)<\/title>/i);
+  return (match?.[1] ?? "").replace(/\s*[-–|]\s*Vercel.*$/i, "").trim();
+}
+
+async function fetchBlogSlugs(limit: number): Promise<string[]> {
+  const res = await fetch(BLOG_BASE, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Blog listing returned ${res.status}`);
+  const html = await res.text();
+  const seen = new Set<string>();
+  const slugs: string[] = [];
+  for (const [, slug] of html.matchAll(/href="\/blog\/([a-z0-9][a-z0-9-]*[a-z0-9])"/gi)) {
+    if (!slug.startsWith("category/") && !seen.has(slug)) {
+      seen.add(slug);
+      slugs.push(slug);
+      if (slugs.length >= limit) break;
+    }
+  }
+  return slugs;
+}
+
+async function fetchArticleMeta(slug: string, index: number, total: number): Promise<ArticleItem> {
+  const res = await fetch(`${BLOG_BASE}/${slug}`, { cache: "no-store" });
+  const html = res.ok ? await res.text() : "";
+  const title = extractTitle(html) || slug;
+  const description = extractMeta(html, "og:description") || extractMeta(html, "description") || "";
+  // Spread publish dates evenly across the last 18 months
+  const now = Date.now();
+  const eighteenMonthsAgo = now - 18 * 30 * 24 * 60 * 60 * 1000;
+  const publishDate = Math.round(eighteenMonthsAgo + (index / Math.max(total - 1, 1)) * (now - eighteenMonthsAgo));
+  return { slug, title, description, publishDate };
 }
 
 async function findExistingArticle(slug: string): Promise<string | null> {
@@ -63,13 +81,13 @@ async function findExistingArticle(slug: string): Promise<string | null> {
 }
 
 async function upsertArticle(
-  item: RssItem
+  item: ArticleItem
 ): Promise<{ slug: string; action: "created" | "updated"; id: string }> {
   const existingId = await findExistingArticle(item.slug);
 
   const body = {
     name: item.title,
-    published: "published",
+    published: "draft",
     data: {
       slug: item.slug,
       title: item.title,
@@ -127,16 +145,18 @@ export async function POST(request: NextRequest) {
   const reqBody = await request.json().catch(() => ({})) as Record<string, unknown>;
   const count = Math.min(Math.max(1, Number(reqBody.count ?? 50)), 100);
 
-  const rssRes = await fetch(BLOG_RSS, { cache: "no-store" });
-  if (!rssRes.ok) {
-    return NextResponse.json({ error: "Failed to fetch Vercel blog RSS feed" }, { status: 502 });
+  let slugs: string[];
+  try {
+    slugs = await fetchBlogSlugs(count);
+  } catch (err) {
+    return NextResponse.json({ error: `Failed to fetch blog listing: ${String(err)}` }, { status: 502 });
   }
-  const rssXml = await rssRes.text();
-  const items = parseRssItems(rssXml, count);
 
-  if (!items.length) {
-    return NextResponse.json({ error: "No articles found in RSS feed" }, { status: 500 });
+  if (!slugs.length) {
+    return NextResponse.json({ error: "No articles found on blog listing page" }, { status: 500 });
   }
+
+  const items = await Promise.all(slugs.map((slug, i) => fetchArticleMeta(slug, i, slugs.length)));
 
   const results: Awaited<ReturnType<typeof upsertArticle>>[] = [];
   for (const item of items) {
