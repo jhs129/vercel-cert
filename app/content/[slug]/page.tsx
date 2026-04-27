@@ -5,6 +5,8 @@ import { BUILDER_API_KEY, getArticleContent } from "@/lib/builder";
 import { isSubscribedServer } from "@/lib/subscription.server";
 import { ArticleClient } from "./ArticleClient";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+const SITE_NAME = "Vercel News Site";
 const DEFAULT_TITLE = "Article";
 const DEFAULT_DESCRIPTION = "";
 
@@ -27,6 +29,7 @@ export async function generateMetadata({
   const title = (content?.data?.title as string | undefined) || DEFAULT_TITLE;
   const meta = content?.data?.metadata as Record<string, unknown> | undefined;
   const description = (meta?.description as string | undefined) || DEFAULT_DESCRIPTION;
+  const media = (meta?.media as string | undefined) || undefined;
   const rawKeywords = meta?.keywords;
 
   let keywords: string[] | undefined;
@@ -36,10 +39,26 @@ export async function generateMetadata({
     keywords = rawKeywords.split(",").map((k) => k.trim()).filter(Boolean);
   }
 
+  const canonicalUrl = SITE_URL ? `${SITE_URL.replace(/\/$/, "")}/content/${slug}` : undefined;
+
   return {
     title,
     ...(description ? { description } : {}),
     ...(keywords ? { keywords } : {}),
+    openGraph: {
+      type: "article",
+      title,
+      ...(description ? { description } : {}),
+      siteName: SITE_NAME,
+      ...(canonicalUrl ? { url: canonicalUrl } : {}),
+      ...(media ? { images: [{ url: media, alt: title }] } : {}),
+    },
+    twitter: {
+      card: media ? "summary_large_image" : "summary",
+      title,
+      ...(description ? { description } : {}),
+      ...(media ? { images: [media] } : {}),
+    },
   };
 }
 
