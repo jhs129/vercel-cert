@@ -34,6 +34,7 @@ interface ArticleItem {
   description: string;
   publishDate: number;
   blocks: BuilderBlock[];
+  categories: string[];
 }
 
 function extractMeta(html: string, property: string): string {
@@ -49,8 +50,9 @@ function extractTitle(html: string): string {
   return (match?.[1] ?? "").replace(/\s*[-–|]\s*Vercel.*$/i, "").trim();
 }
 
-async function fetchBlogSlugs(limit: number): Promise<string[]> {
-  const res = await fetch(BLOG_BASE, { cache: "no-store" });
+async function fetchBlogSlugs(limit: number, category?: string): Promise<string[]> {
+  const url = category ? `${BLOG_BASE}/category/${encodeURIComponent(category)}` : BLOG_BASE;
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Blog listing returned ${res.status}`);
   const html = await res.text();
   const seen = new Set<string>();
@@ -63,6 +65,18 @@ async function fetchBlogSlugs(limit: number): Promise<string[]> {
     }
   }
   return slugs;
+}
+
+function extractCategories(html: string): string[] {
+  const seen = new Set<string>();
+  const categories: string[] = [];
+  for (const [, cat] of html.matchAll(/href="\/blog\/category\/([a-z0-9][a-z0-9-]*)"/gi)) {
+    if (!seen.has(cat)) {
+      seen.add(cat);
+      categories.push(cat);
+    }
+  }
+  return categories;
 }
 
 function markdownToBlocks(markdown: string): BuilderBlock[] {
@@ -96,7 +110,7 @@ function markdownToBlocks(markdown: string): BuilderBlock[] {
   return blocks.length ? blocks : [];
 }
 
-async function fetchArticleMeta(slug: string, index: number, total: number): Promise<ArticleItem> {
+async function fetchArticleMeta(slug: string, index: number, total: number, knownCategory?: string): Promise<ArticleItem> {
   const url = `${BLOG_BASE}/${slug}`;
   // Fetch HTML for meta tags and markdown for body content in parallel
   const [htmlRes, mdRes] = await Promise.all([
@@ -109,6 +123,7 @@ async function fetchArticleMeta(slug: string, index: number, total: number): Pro
 
   const title = extractTitle(html) || slug;
   const description = extractMeta(html, "og:description") || extractMeta(html, "description") || "";
+  const categories = knownCategory ? [knownCategory] : extractCategories(html);
 
   const blocks = markdown ? markdownToBlocks(markdown) : [
     { "@type": "@builder.io/sdk:Element" as const, component: { name: "Text", options: { text: `<p>${description}</p>` } } },
@@ -119,7 +134,7 @@ async function fetchArticleMeta(slug: string, index: number, total: number): Pro
   const eighteenMonthsAgo = now - 18 * 30 * 24 * 60 * 60 * 1000;
   const publishDate = Math.round(eighteenMonthsAgo + (index / Math.max(total - 1, 1)) * (now - eighteenMonthsAgo));
 
-  return { slug, title, description, publishDate, blocks };
+  return { slug, title, description, publishDate, blocks, categories };
 }
 
 async function findExistingArticle(slug: string): Promise<string | null> {
@@ -147,6 +162,7 @@ async function upsertArticle(
       title: item.title,
       testData: true,
       publishDate: item.publishDate,
+      ...(item.categories.length ? { categories: item.categories } : {}),
       metadata: {
         description: item.description.slice(0, 255),
         media: PLACEHOLDER_IMAGE,
@@ -190,10 +206,11 @@ export async function POST(request: NextRequest) {
 
   const reqBody = await request.json().catch(() => ({})) as Record<string, unknown>;
   const count = Math.min(Math.max(1, Number(reqBody.count ?? 50)), 100);
+  const category = typeof reqBody.category === "string" && reqBody.category.trim() ? reqBody.category.trim() : undefined;
 
   let slugs: string[];
   try {
-    slugs = await fetchBlogSlugs(count);
+    slugs = await fetchBlogSlugs(count, category);
   } catch (err) {
     return NextResponse.json({ error: `Failed to fetch blog listing: ${String(err)}` }, { status: 502 });
   }
@@ -202,7 +219,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No articles found on blog listing page" }, { status: 500 });
   }
 
-  const items = await Promise.all(slugs.map((slug, i) => fetchArticleMeta(slug, i, slugs.length)));
+  const items = await Promise.all(slugs.map((slug, i) => fetchArticleMeta(slug, i, slugs.length, category)));
 
   const results: Awaited<ReturnType<typeof upsertArticle>>[] = [];
   for (const item of items) {
