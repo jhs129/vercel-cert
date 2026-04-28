@@ -48,7 +48,7 @@ export default function CategoryBrowseClient({
       : [];
 
     fetch(`/api/articles?limit=${MAX_ARTICLES}`)
-      .then((res) => res.json())
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then(({ articles, categories }: { articles: CmsArticle[]; categories: string[] }) => {
         setArticles(articles);
         setCategories(configuredCategories.length > 0 ? configuredCategories : categories);

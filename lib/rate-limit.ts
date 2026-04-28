@@ -1,3 +1,8 @@
+// In-memory fixed-window rate limiter. Each serverless instance maintains its own
+// Map, so limits are enforced per-instance rather than globally across all instances.
+// This provides best-effort throttling; for strict distributed enforcement use a
+// shared store (e.g. Upstash Redis via Vercel KV).
+
 interface RateLimitEntry {
   count: number;
   windowStart: number;
@@ -29,10 +34,16 @@ export function rateLimit(key: string, limit: number, windowSecs: number): RateL
   return { allowed: true };
 }
 
-// Periodically prune expired entries to prevent unbounded Map growth.
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of store) {
-    if (now - entry.windowStart >= 60_000) store.delete(key);
-  }
-}, 60_000);
+// Prune expired entries once per minute. Guarded by a module-level flag so HMR
+// re-evaluations and parallel builds don't stack up duplicate timers. unref()
+// prevents this timer from keeping the Node.js event loop alive.
+if (!(globalThis as Record<string, unknown>).__rateLimitPruneStarted) {
+  (globalThis as Record<string, unknown>).__rateLimitPruneStarted = true;
+  const handle = setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of store) {
+      if (now - entry.windowStart >= 60_000) store.delete(key);
+    }
+  }, 60_000);
+  (handle as unknown as { unref?: () => void }).unref?.();
+}
