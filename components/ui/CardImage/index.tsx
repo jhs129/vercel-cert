@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode, ElementType } from "react";
 import { cn } from "@/lib/utils";
 import type { Themeable, Stylable } from "@/lib/types";
@@ -14,6 +15,9 @@ export interface CardImageProps extends Themeable, Stylable {
   alt: string;
   /** Card headline text */
   headline: string;
+
+  slug?: string;
+
   /** Card body text */
   body: string;
   /** Semantic heading level for the headline (default: 3) */
@@ -26,6 +30,7 @@ export default function CardImage({
   src = "https://placehold.co/600x400.png",
   alt,
   headline,
+  slug,
   body,
   headingLevel = 3,
   theme = "light",
@@ -59,9 +64,13 @@ export default function CardImage({
       {/* Content */}
       <div className="flex flex-col flex-1 gap-3 p-4">
         {/* Headline */}
-        <Tag className="line-clamp-2 text-lg font-semibold leading-snug tracking-tight mb-0">
-          {headline}
-        </Tag>
+          <Tag className="line-clamp-2 text-lg font-semibold leading-snug tracking-tight mb-0">
+            {slug ? (
+              <Link href={`/content/${slug}`}>{headline}</Link>
+            ) : (
+              headline
+            )}
+          </Tag>
 
         {/* Body text */}
         <p className="line-clamp-3 text-sm leading-relaxed mb-0 opacity-80">

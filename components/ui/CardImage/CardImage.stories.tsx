@@ -13,6 +13,9 @@ const meta: Meta<typeof CardImage> = {
       control: "select",
       options: ["light", "dark"],
     },
+    slug: {
+      control: "text",
+    },
     headingLevel: {
       control: "select",
       options: [2, 3, 4],
@@ -29,6 +32,7 @@ export const AllSlotsFilled: Story = {
     src: "https://placehold.co/600x338.png",
     alt: "A placeholder image showing a card with all content slots filled",
     headline: "Introducing the Next Generation Platform",
+    slug: "next-generation-platform",
     body: "Our platform brings together cutting-edge technology and intuitive design to help teams ship faster, collaborate better, and build products their customers love.",
     headingLevel: 3,
     theme: "light",
@@ -48,6 +52,7 @@ export const DarkTheme: Story = {
     src: "https://placehold.co/600x338.png",
     alt: "A placeholder image for a dark-themed card",
     headline: "Dark Theme Variant",
+    slug: "dark-theme-variant",
     body: "This card uses the dark theme, providing high contrast against dark backgrounds while maintaining WCAG AA compliance.",
     headingLevel: 3,
     theme: "dark",
@@ -68,6 +73,7 @@ export const LongContent: Story = {
     src: "https://placehold.co/600x338.png",
     alt: "A placeholder image for a card with long content",
     headline: "This is a Very Long Headline That Should Be Truncated After Two Lines of Text",
+    slug: "very-long-headline-truncation-example",
     body: "This is a very long body text that should be clamped after three lines. It keeps going and going to demonstrate the line-clamp behavior. The text will be cut off with an ellipsis after three lines regardless of how much content is provided.",
     headingLevel: 3,
     theme: "light",
@@ -88,6 +94,7 @@ export const DecorativeImage: Story = {
     src: "https://placehold.co/600x338.png",
     alt: "",
     headline: "Decorative Image Card",
+    slug: "decorative-image-card",
     body: "This card uses an empty alt string, marking the image as decorative so screen readers skip it.",
     headingLevel: 3,
     theme: "light",
@@ -100,6 +107,7 @@ export const H2Heading: Story = {
     src: "https://placehold.co/600x338.png",
     alt: "A feature card image",
     headline: "Feature Section Heading",
+    slug: "feature-section-heading",
     body: "Using an h2 heading level for cards that are primary section headings on the page.",
     headingLevel: 2,
     theme: "light",
@@ -122,6 +130,7 @@ export const MultiCardRow: Story = {
         src="https://placehold.co/600x338.png"
         alt="First card image"
         headline="Short Headline"
+        slug="short-headline"
         body="Brief body."
         theme="light"
       >
@@ -136,6 +145,7 @@ export const MultiCardRow: Story = {
         src="https://placehold.co/600x338.png"
         alt="Second card image"
         headline="Medium Length Headline That Takes Two Lines"
+        slug="medium-length-headline-two-lines"
         body="This card has a moderately long body text that takes up more vertical space than the first card, demonstrating equal height behavior."
         theme="light"
       >
@@ -150,6 +160,7 @@ export const MultiCardRow: Story = {
         src="https://placehold.co/600x338.png"
         alt="Third card image"
         headline="Another Card"
+        slug="another-card"
         body="Short body text."
         theme="light"
       >
