@@ -7,6 +7,8 @@ import { Header } from "@/components/navigation/header";
 import { Footer } from "@/components/navigation/footer";
 import { AlertBanner } from "@/components/ui/AlertBanner";
 import { GoogleTagManager } from "@next/third-parties/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -70,6 +72,8 @@ export default function RootLayout({
         </div>
         <main className="container mx-auto flex-1 px-page-gutter py-5">{children}</main>
         <Footer />
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
