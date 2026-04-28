@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { BUILDER_API_KEY, getArticleContent } from "@/lib/builder";
 import { isSubscribedServer } from "@/lib/subscription.server";
+import { generateBlurPlaceholder } from "@/lib/image-utils";
 import { ArticleClient } from "./ArticleClient";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -73,10 +74,7 @@ export default async function ArticlePage({
   const resolvedSearchParams = await searchParams;
 
   const previewing = isPreviewing(resolvedSearchParams);
-  const [content, subscribed] = await Promise.all([
-    getArticleContent(slug, resolvedSearchParams),
-    isSubscribedServer(),
-  ]);
+  const content = await getArticleContent(slug, resolvedSearchParams);
 
   if (!content && !previewing) {
     notFound();
@@ -97,6 +95,11 @@ export default async function ArticlePage({
       })
     : null;
 
+  const [subscribed, heroImageBlur] = await Promise.all([
+    isSubscribedServer(),
+    heroImage ? generateBlurPlaceholder(heroImage) : Promise.resolve(undefined),
+  ]);
+
   return (
     <ArticleClient
       content={subscribed || previewing ? content : null}
@@ -104,6 +107,7 @@ export default async function ArticlePage({
       title={title}
       formattedDate={formattedDate}
       heroImage={heroImage}
+      heroImageBlur={heroImageBlur}
       teaser={teaser}
       initialSubscribed={subscribed}
     />

@@ -21,6 +21,8 @@ export interface CardImageProps extends Themeable, Stylable {
   body: string;
   /** Semantic heading level for the headline (default: 3) */
   headingLevel?: HeadingLevel;
+  /** Base64 blur data URL for the image placeholder (generated server-side) */
+  blurDataURL?: string;
   /** CTA area rendered below body text */
   children?: ReactNode;
 }
@@ -34,6 +36,7 @@ export default function CardImage({
   headingLevel = 3,
   theme = "light",
   styles,
+  blurDataURL,
   children,
 }: CardImageProps) {
   const Tag = `h${headingLevel}` as ElementType;
@@ -57,6 +60,8 @@ export default function CardImage({
           className="object-cover"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
           quality={80}
+          placeholder={blurDataURL ? "blur" : "empty"}
+          blurDataURL={blurDataURL}
         />
       </div>
 
