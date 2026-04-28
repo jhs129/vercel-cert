@@ -35,28 +35,26 @@ export function Alert({ variant = "breaking", label, message, action }: AlertPro
   const { iconSrc, iconFilter, badgeBorder } = variantStyles[variant];
 
   return (
-    <div
-      className="w-full bg-black text-white flex items-center gap-3 px-6 py-3"
-      role="alert"
-      aria-live="polite"
-    >
-      <Image
-        src={iconSrc}
-        alt=""
-        width={18}
-        height={18}
-        className={iconFilter}
-        aria-hidden
-      />
-      {label && (
-        <span
-          className={`border font-bold text-xs uppercase tracking-wider px-2 py-0.5 shrink-0 ${badgeBorder}`}
-        >
-          {label}
-        </span>
-      )}
-      <span className="text-sm">{message}</span>
-      {action}
+    <div className="w-full bg-black text-white" role="alert" aria-live="polite">
+      <div className="container mx-auto px-page-gutter flex items-center gap-3 py-3">
+        <Image
+          src={iconSrc}
+          alt=""
+          width={18}
+          height={18}
+          className={iconFilter}
+          aria-hidden
+        />
+        {label && (
+          <span
+            className={`border font-bold text-xs uppercase tracking-wider px-2 py-0.5 shrink-0 ${badgeBorder}`}
+          >
+            {label}
+          </span>
+        )}
+        <span className="text-sm">{message}</span>
+        {action}
+      </div>
     </div>
   );
 }
