@@ -46,6 +46,9 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", GeistSans.variable, GeistMono.variable, "font-sans", geist.variable)}
     >
       <body className="min-h-full bg-background text-foreground flex flex-col">
+        {/* Third-party scripts — see CLAUDE.md "Third-Party Scripts" for loading conventions.
+            GoogleTagManager uses afterInteractive internally (compliant).
+            The noscript fallback is intentional — @next/third-parties does not include it. */}
         {gtmId && (
           <>
             <GoogleTagManager gtmId={gtmId} />
