@@ -114,6 +114,22 @@ export default function CardImageTestPage() {
         </div>
       </section>
 
+      {/* Linked headline variant */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Linked Headline (slug prop)</h2>
+        <div className="flex">
+          <CardImage
+            src="https://placehold.co/600x338.png"
+            alt="Card with a linked headline"
+            headline="Click This Headline to Navigate to an Article"
+            slug="we-ralph-wiggumed-webstreams-to-make-them-10x-faster"
+            body="When the slug prop is provided the headline becomes a Next.js Link pointing to /content/[slug]. Hover to see the underline affordance."
+            headingLevel={3}
+            theme="light"
+          />
+        </div>
+      </section>
+
       {/* Line clamp demonstration */}
       <section>
         <h2 className="text-2xl font-semibold mb-4">Line Clamp Demonstration</h2>

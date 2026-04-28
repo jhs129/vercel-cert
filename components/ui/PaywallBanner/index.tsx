@@ -1,6 +1,7 @@
 "use client";
 
 import { subscribeCookie } from "@/lib/subscription";
+import Image from "next/image";
 
 interface PaywallBannerProps {
   title: string;
@@ -18,8 +19,8 @@ export function PaywallBanner({ title, heroImage, teaser, onSubscribe }: Paywall
   return (
     <article className="max-w-3xl mx-auto py-8">
       {heroImage && (
-        <div className="w-full aspect-video mb-8 overflow-hidden rounded-lg">
-          <img src={heroImage} alt={title} className="w-full h-full object-cover" />
+        <div className="relative w-full aspect-video mb-8 overflow-hidden rounded-lg">
+          <Image src={heroImage} alt={title} fill sizes="(max-width: 768px) 100vw, 768px" className="object-cover" priority />
         </div>
       )}
 

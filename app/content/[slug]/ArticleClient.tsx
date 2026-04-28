@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import { isPreviewing } from "@builder.io/sdk-react";
 import type { BuilderContent } from "@builder.io/sdk-react";
@@ -21,6 +22,46 @@ interface ArticleClientProps {
   initialSubscribed: boolean;
 }
 
+function sanitizeValue<T>(value: T): T {
+  if (typeof value === "string") {
+    return value
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      .replace(/<script\b[^>]*\/?>/gi, "") as T;
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => sanitizeValue(item))
+      .filter((item) => {
+        if (!item || typeof item !== "object") return true;
+        const candidate = item as Record<string, unknown>;
+        const tagName = candidate.tagName;
+        const component = candidate.component as Record<string, unknown> | undefined;
+        return (
+          !(typeof tagName === "string" && tagName.toLowerCase() === "script") &&
+          !(typeof component?.name === "string" && component.name.toLowerCase() === "script")
+        );
+      }) as T;
+  }
+
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const sanitizedEntries = Object.entries(record).map(([key, nestedValue]) => [
+      key,
+      sanitizeValue(nestedValue),
+    ]);
+
+    return Object.fromEntries(sanitizedEntries) as T;
+  }
+
+  return value;
+}
+
+function sanitizeBuilderContent(content: BuilderContent | null): BuilderContent | null {
+  if (!content) return content;
+  return sanitizeValue(content);
+}
+
 export function ArticleClient({
   content,
   apiKey,
@@ -35,8 +76,9 @@ export function ArticleClient({
   // rather than maintaining a duplicate subscribed state that can drift.
   const [subscribePending, setSubscribePending] = useState(false);
   const router = useRouter();
+  const sanitizedContent = useMemo(() => sanitizeBuilderContent(content), [content]);
 
-  if (subscribePending && !content && !isPreviewing()) {
+  if (subscribePending && !sanitizedContent && !isPreviewing()) {
     return (
       <div className="max-w-3xl mx-auto py-8 flex items-center justify-center min-h-[50vh]">
         <p className="text-muted">Loading article…</p>
@@ -44,7 +86,7 @@ export function ArticleClient({
     );
   }
 
-  if (!initialSubscribed && !content && !isPreviewing()) {
+  if (!initialSubscribed && !sanitizedContent && !isPreviewing()) {
     return (
       <PaywallBanner
         title={title}
@@ -58,16 +100,19 @@ export function ArticleClient({
     );
   }
 
-  if (!content && !isPreviewing()) return null;
+  if (!sanitizedContent && !isPreviewing()) return null;
 
   return (
-    <article className="max-w-3xl mx-auto py-8">
+    <article className="py-8">
       {heroImage && (
-        <div className="w-full aspect-video mb-8 overflow-hidden rounded-lg">
-          <img
+        <div className="relative w-full aspect-video mb-8 overflow-hidden rounded-lg">
+          <Image
             src={heroImage}
             alt={title}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 1024px) 100vw, 984px"
+            className="object-cover"
+            priority
           />
         </div>
       )}
@@ -84,7 +129,7 @@ export function ArticleClient({
       <div className="prose max-w-none">
         <ArticleContent
           model="article"
-          content={content}
+          content={sanitizedContent}
           apiKey={apiKey}
           canTrack={false}
         />

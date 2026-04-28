@@ -15,9 +15,8 @@ export interface CardImageProps extends Themeable, Stylable {
   alt: string;
   /** Card headline text */
   headline: string;
-
+  /** Optional slug — when provided, headline becomes a Link to `/content/${slug}` */
   slug?: string;
-
   /** Card body text */
   body: string;
   /** Semantic heading level for the headline (default: 3) */
@@ -66,7 +65,7 @@ export default function CardImage({
         {/* Headline */}
           <Tag className="line-clamp-2 text-lg font-semibold leading-snug tracking-tight mb-0">
             {slug ? (
-              <Link href={`/content/${slug}`}>{headline}</Link>
+              <Link href={`/content/${slug}`} className="hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded">{headline}</Link>
             ) : (
               headline
             )}
