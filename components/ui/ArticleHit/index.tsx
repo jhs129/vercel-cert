@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface ArticleHitProps {
   title: string;
@@ -18,10 +19,12 @@ export function ArticleHit({ title, slug, publishDate, description, categories }
   return (
     <div className="flex flex-col gap-1 border-b border-border pb-4">
       <h3 className="text-lg font-bold mb-0">
-        <Link href={`/content/${slug}`}>{title}</Link>
+        <Link href={`/content/${slug}`}>
+          <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(title) }} />
+        </Link>
       </h3>
       {formattedDate && <div className="text-sm text-muted">{formattedDate}</div>}
-      {description && <div className="text-sm">{description}</div>}
+      {description && <div className="text-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />}
       {categories && categories.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-1">
           {categories.map((cat) => (
