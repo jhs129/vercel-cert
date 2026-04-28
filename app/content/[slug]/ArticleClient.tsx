@@ -18,6 +18,7 @@ interface ArticleClientProps {
   title: string;
   formattedDate: string | null;
   heroImage: string | undefined;
+  heroImageBlur: string | undefined;
   teaser: string;
   initialSubscribed: boolean;
 }
@@ -68,6 +69,7 @@ export function ArticleClient({
   title,
   formattedDate,
   heroImage,
+  heroImageBlur,
   teaser,
   initialSubscribed,
 }: ArticleClientProps) {
@@ -114,6 +116,8 @@ export function ArticleClient({
             className="object-cover"
             quality={80}
             priority
+            placeholder={heroImageBlur ? "blur" : "empty"}
+            blurDataURL={heroImageBlur}
           />
         </div>
       )}
