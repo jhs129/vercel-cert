@@ -2,12 +2,11 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash(git push*)",
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(git push*)",
-            "command": "cd /Users/johnhschneider/dev/vercel-cert && pnpm build && pnpm lint",
+            "command": "pnpm build && pnpm lint",
             "statusMessage": "Enforcing build + lint before push...",
             "asyncRewake": true
           }
@@ -16,19 +15,22 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash(pnpm build*)",
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(pnpm build*)",
-            "command": "cd /Users/johnhschneider/dev/vercel-cert && node scripts/check-hydration.mjs",
+            "command": "node scripts/check-hydration.mjs",
             "statusMessage": "Checking for hydration errors...",
             "asyncRewake": true
-          },
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(gh pr create*)",
+        "hooks": [
           {
             "type": "command",
-            "if": "Bash(gh pr create*)",
-            "command": "cd /Users/johnhschneider/dev/vercel-cert && node scripts/check-hydration.mjs",
+            "command": "node scripts/check-hydration.mjs",
             "statusMessage": "Checking for hydration errors before PR...",
             "asyncRewake": true
           }

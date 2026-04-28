@@ -28,7 +28,7 @@ export function Footer({
       <div className="container mx-auto px-page-gutter py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <Link href="/" className="shrink-0">
-            <Image src={logo} alt="Logo" width={150} height={100} />
+            <Image src={logo} alt="Logo" width={150} height={100} quality={85} />
           </Link>
 
           <nav className="flex flex-wrap justify-center gap-6">

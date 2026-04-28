@@ -30,6 +30,12 @@ export const CardImageRegistration: RegisteredComponent = {
       helperText: "The card headline (clamped to 2 lines)",
     },
     {
+      name: "slug",
+      type: "string",
+      required: false,
+      helperText: "URL slug appended to /content/ (e.g. 'my-article' → /content/my-article)",
+    },
+    {
       name: "body",
       type: "longText",
       defaultValue: "Card body text goes here. Longer text will be truncated after three lines.",
