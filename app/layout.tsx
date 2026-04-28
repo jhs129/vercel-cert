@@ -76,10 +76,10 @@ export default function RootLayout({
         )}
         <div className="container mx-auto px-page-gutter">
           <Header />
-          <Suspense>
-            <AlertBanner />
-          </Suspense>
         </div>
+        <Suspense>
+          <AlertBanner />
+        </Suspense>
         <main className="container mx-auto flex-1 px-page-gutter py-5">{children}</main>
         <Footer />
         <SpeedInsights />
