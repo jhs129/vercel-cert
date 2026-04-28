@@ -7,6 +7,8 @@ import { Header } from "@/components/navigation/header";
 import { Footer } from "@/components/navigation/footer";
 import { AlertBanner } from "@/components/ui/AlertBanner";
 import { GoogleTagManager } from "@next/third-parties/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +48,9 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", GeistSans.variable, GeistMono.variable, "font-sans", geist.variable)}
     >
       <body className="min-h-full bg-background text-foreground flex flex-col">
+        {/* Third-party scripts — see CLAUDE.md "Third-Party Scripts" for loading conventions.
+            GoogleTagManager uses afterInteractive internally (compliant).
+            The noscript fallback is intentional — @next/third-parties does not include it. */}
         {gtmId && (
           <>
             <GoogleTagManager gtmId={gtmId} />
@@ -67,6 +72,8 @@ export default function RootLayout({
         </div>
         <main className="container mx-auto flex-1 px-page-gutter py-5">{children}</main>
         <Footer />
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

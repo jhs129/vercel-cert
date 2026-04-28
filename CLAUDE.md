@@ -169,3 +169,22 @@ Builder.registerComponent(MyComponent, {
 ```
 
 The `theme-dark` and `theme-light` CSS classes are defined in `app/globals.css`. To add a new theme, add the class there and add the value to the `Theme` union in `lib/types.ts`.
+
+### Third-Party Scripts
+
+All third-party scripts must use `next/script` (or `@next/third-parties` wrappers) — never a raw `<script>` HTML tag.
+
+**Strategy selection:**
+
+| Strategy | Use for |
+|----------|---------|
+| `afterInteractive` | Default — analytics, tracking, payment, authentication scripts |
+| `lazyOnload` | Non-essential widgets: chat, social embeds, comment systems |
+| `beforeInteractive` | Critical polyfills only (e.g., required before React hydration). Never analytics or marketing. |
+| `worker` | Not adopted — experimental, limited browser support. |
+
+**Rules:**
+- Any script requiring `onLoad`, `onReady`, or `onError` callbacks must live in a `"use client"` component — not inline in a server layout or page file.
+- Prefer `@next/third-parties` wrappers (e.g., `<GoogleTagManager />`) over raw `<Script>` when an official wrapper exists.
+- The `noscript` fallback for GTM is intentional — `@next/third-parties` does not include it automatically.
+- When using a non-standard strategy, add an inline comment explaining why.
