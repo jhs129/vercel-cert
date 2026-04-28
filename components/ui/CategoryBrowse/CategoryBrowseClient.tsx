@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { CmsArticle } from "@/lib/cms-models";
-import { fetchArticles, fetchArticleCategories } from "@/lib/builder";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 import { ArticleHit } from "@/components/ui/ArticleHit";
 import SearchEmptyState from "@/components/ui/SearchEmptyState";
@@ -48,15 +47,11 @@ export default function CategoryBrowseClient({
       ? categoriesProp.filter((c) => c.value !== "all").map((c) => c.value)
       : [];
 
-    Promise.all([
-      fetchArticles(MAX_ARTICLES),
-      configuredCategories && configuredCategories.length > 0
-        ? Promise.resolve(configuredCategories)
-        : fetchArticleCategories(),
-    ])
-      .then(([arts, cats]) => {
-        setArticles(arts);
-        setCategories(cats);
+    fetch(`/api/articles?limit=${MAX_ARTICLES}`)
+      .then((res) => res.json())
+      .then(({ articles, categories }: { articles: CmsArticle[]; categories: string[] }) => {
+        setArticles(articles);
+        setCategories(configuredCategories.length > 0 ? configuredCategories : categories);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));

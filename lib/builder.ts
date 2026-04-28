@@ -1,3 +1,4 @@
+import "server-only";
 import { fetchOneEntry, fetchEntries, isPreviewing, getBuilderSearchParams } from "@builder.io/sdk-react";
 import { cache } from "react";
 import type { CmsArticle } from "@/lib/cms-models";
