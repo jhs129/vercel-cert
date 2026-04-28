@@ -8,6 +8,7 @@ import { ArticleHit } from "@/components/ui/ArticleHit";
 import SearchEmptyState from "@/components/ui/SearchEmptyState";
 import SearchLoadingState from "@/components/ui/SearchLoadingState";
 import type { Themeable } from "@/lib/types";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 const PAGE_SIZE = 10;
 const MAX_ARTICLES = 100;
@@ -77,7 +78,7 @@ export default function CategoryBrowseClient({
 
   return (
     <div className={`theme-${theme} flex flex-col gap-6 p-6`}>
-      {title && <h2>{title}</h2>}
+      {title && <h2 dangerouslySetInnerHTML={{ __html: sanitizeHtml(title) }} />}
       <SearchLoadingState isLoading={isLoading} />
       {!isLoading && (
         <>
