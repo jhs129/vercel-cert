@@ -114,10 +114,10 @@ Potential conflicts:
 
 ## Step 3: Transition All Stories to In Progress
 
-For each Dev Ready story:
+For each Dev Ready story, first get the available transitions, then pass the transition ID as an object (the MCP tool requires `transition={"id": "..."}`, not `transitionId`):
 ```
 getTransitionsForJiraIssue(cloudId="...", issueIdOrKey="<key>")
-transitionJiraIssue(cloudId="...", issueIdOrKey="<key>", transitionId="<in-progress-id>")
+transitionJiraIssue(cloudId="...", issueIdOrKey="<key>", transition={"id": "<in-progress-id>"})
 ```
 
 Do all transitions before writing any code.
@@ -207,10 +207,10 @@ Dispatch a `pr-review-toolkit:code-reviewer` subagent. Pass it:
 3. Re-dispatch the reviewer on the updated diff.
 4. If clean → proceed to Step 8.
 5. If unresolved questions remain:
-   - Transition the **epic** Jira ticket to Blocked:
+   - Transition the **epic** Jira ticket to Blocked (note: pass transition ID as an object):
      ```
      getTransitionsForJiraIssue(cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860", issueIdOrKey="$ARGUMENTS")
-     transitionJiraIssue(cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860", issueIdOrKey="$ARGUMENTS", transitionId="<blocked-id>")
+     transitionJiraIssue(cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860", issueIdOrKey="$ARGUMENTS", transition={"id": "<blocked-id>"})
      addCommentToJiraIssue(
        cloudId="c546b8b8-c5e9-4677-8322-7a935c3d3860",
        issueIdOrKey="$ARGUMENTS",
@@ -289,9 +289,10 @@ EOF
 
 For **each** Dev Ready story that was implemented:
 
-**a) Transition to "In Review":**
+**a) Transition to "In Review"** (note: pass transition ID as an object, not a string):
 ```
-transitionJiraIssue(cloudId="...", issueIdOrKey="<key>", transitionId="<in-review-id>")
+getTransitionsForJiraIssue(cloudId="...", issueIdOrKey="<key>")
+transitionJiraIssue(cloudId="...", issueIdOrKey="<key>", transition={"id": "<in-review-id>"})
 ```
 
 **b) Assign to the reporter** (use `reporter.accountId` from the ticket):
@@ -305,10 +306,10 @@ editJiraIssue(cloudId="...", issueIdOrKey="<key>", fields={"assignee": {"account
 
 ## Step 10: Update the Epic in Jira
 
-**a) Transition the epic to "In Review":**
+**a) Transition the epic to "In Review"** (note: pass transition ID as an object, not a string):
 ```
 getTransitionsForJiraIssue(cloudId="...", issueIdOrKey="$ARGUMENTS")
-transitionJiraIssue(cloudId="...", issueIdOrKey="$ARGUMENTS", transitionId="<in-review-id>")
+transitionJiraIssue(cloudId="...", issueIdOrKey="$ARGUMENTS", transition={"id": "<in-review-id>"})
 ```
 
 **b) Add a comment to the epic** with clickable ADF links covering:
