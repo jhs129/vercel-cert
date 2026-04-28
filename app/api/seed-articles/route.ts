@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { withRateLimit } from "@/lib/api-utils";
 
 const PRIVATE_KEY = process.env.BUILDER_PRIVATE_KEY ?? "";
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY ?? "";
@@ -196,7 +198,15 @@ async function upsertArticle(
   return { slug: item.slug, action: "created", id: data.id ?? "" };
 }
 
+const postBodySchema = z.object({
+  count: z.coerce.number().int().min(1).max(100).catch(50),
+  category: z.string().trim().min(1).optional(),
+});
+
 export async function POST(request: NextRequest) {
+  const { reqId, blocked } = withRateLimit(request, 10, 60, "POST /api/seed-articles");
+  if (blocked) return blocked;
+
   const authError = checkAuth(request);
   if (authError) return authError;
 
@@ -204,38 +214,45 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "BUILDER_PRIVATE_KEY is not set" }, { status: 500 });
   }
 
-  const reqBody = await request.json().catch(() => ({})) as Record<string, unknown>;
-  const count = Math.min(Math.max(1, Number(reqBody.count ?? 50)), 100);
-  const category = typeof reqBody.category === "string" && reqBody.category.trim() ? reqBody.category.trim() : undefined;
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = postBodySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
 
-  let slugs: string[];
+  const { count, category } = parsed.data;
+
   try {
-    slugs = await fetchBlogSlugs(count, category);
+    const slugs = await fetchBlogSlugs(count, category);
+
+    if (!slugs.length) {
+      return NextResponse.json({ error: "No articles found on blog listing page" }, { status: 500 });
+    }
+
+    const items = await Promise.all(slugs.map((slug, i) => fetchArticleMeta(slug, i, slugs.length, category)));
+
+    const results: Awaited<ReturnType<typeof upsertArticle>>[] = [];
+    for (const item of items) {
+      results.push(await upsertArticle(item));
+    }
+
+    return NextResponse.json({
+      requested: count,
+      created: results.filter((r) => r.action === "created").length,
+      updated: results.filter((r) => r.action === "updated").length,
+      total: results.length,
+      articles: results,
+    });
   } catch (err) {
-    return NextResponse.json({ error: `Failed to fetch blog listing: ${String(err)}` }, { status: 502 });
+    console.error(`[${reqId}] POST /api/seed-articles unexpected error`, err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  if (!slugs.length) {
-    return NextResponse.json({ error: "No articles found on blog listing page" }, { status: 500 });
-  }
-
-  const items = await Promise.all(slugs.map((slug, i) => fetchArticleMeta(slug, i, slugs.length, category)));
-
-  const results: Awaited<ReturnType<typeof upsertArticle>>[] = [];
-  for (const item of items) {
-    results.push(await upsertArticle(item));
-  }
-
-  return NextResponse.json({
-    requested: count,
-    created: results.filter((r) => r.action === "created").length,
-    updated: results.filter((r) => r.action === "updated").length,
-    total: results.length,
-    articles: results,
-  });
 }
 
 export async function DELETE(request: NextRequest) {
+  const { reqId, blocked } = withRateLimit(request, 10, 60, "DELETE /api/seed-articles");
+  if (blocked) return blocked;
+
   const authError = checkAuth(request);
   if (authError) return authError;
 
@@ -243,32 +260,37 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "BUILDER_PRIVATE_KEY is not set" }, { status: 500 });
   }
 
-  let offset = 0;
-  let deleted = 0;
+  try {
+    let offset = 0;
+    let deleted = 0;
 
-  for (;;) {
-    const query = encodeURIComponent(JSON.stringify({ "data.testData": true }));
-    const res = await fetch(
-      `${CONTENT_API}/article?apiKey=${PUBLIC_KEY}&query=${query}&limit=100&offset=${offset}&includeUnpublished=true`,
-      { headers: { Authorization: `Bearer ${PRIVATE_KEY}` }, cache: "no-store" }
-    );
-    if (!res.ok) break;
-    const data = await res.json() as { results?: { id: string }[] };
-    if (!data.results?.length) break;
+    for (;;) {
+      const query = encodeURIComponent(JSON.stringify({ "data.testData": true }));
+      const res = await fetch(
+        `${CONTENT_API}/article?apiKey=${PUBLIC_KEY}&query=${query}&limit=100&offset=${offset}&includeUnpublished=true`,
+        { headers: { Authorization: `Bearer ${PRIVATE_KEY}` }, cache: "no-store" }
+      );
+      if (!res.ok) break;
+      const data = await res.json() as { results?: { id: string }[] };
+      if (!data.results?.length) break;
 
-    await Promise.all(
-      data.results.map((entry) =>
-        fetch(`${WRITE_API}/article/${entry.id}?triggerWebhooks=false`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${PRIVATE_KEY}` },
-        })
-      )
-    );
-    deleted += data.results.length;
+      await Promise.all(
+        data.results.map((entry) =>
+          fetch(`${WRITE_API}/article/${entry.id}?triggerWebhooks=false`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${PRIVATE_KEY}` },
+          })
+        )
+      );
+      deleted += data.results.length;
 
-    if (data.results.length < 100) break;
-    offset += 100;
+      if (data.results.length < 100) break;
+      offset += 100;
+    }
+
+    return NextResponse.json({ deleted });
+  } catch (err) {
+    console.error(`[${reqId}] DELETE /api/seed-articles unexpected error`, err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  return NextResponse.json({ deleted });
 }

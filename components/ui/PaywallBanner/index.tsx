@@ -10,7 +10,12 @@ interface PaywallBannerProps {
   onSubscribe: () => void;
 }
 
-export function PaywallBanner({ title, heroImage, teaser, onSubscribe }: PaywallBannerProps) {
+export function PaywallBanner({
+  title,
+  heroImage,
+  teaser,
+  onSubscribe,
+}: PaywallBannerProps) {
   function handleSubscribe() {
     subscribeCookie();
     onSubscribe();
@@ -20,12 +25,22 @@ export function PaywallBanner({ title, heroImage, teaser, onSubscribe }: Paywall
     <article className="max-w-3xl mx-auto py-8">
       {heroImage && (
         <div className="relative w-full aspect-video mb-8 overflow-hidden rounded-lg">
-          <Image src={heroImage} alt={title} fill sizes="(max-width: 768px) 100vw, 768px" className="object-cover" quality={80} priority />
+          <Image
+            src={heroImage}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-cover"
+            quality={80}
+            preload
+          />
         </div>
       )}
 
       <header className="mb-6">
-        <h1 className="text-4xl font-bold text-foreground leading-tight">{title}</h1>
+        <h1 className="text-4xl font-bold text-foreground leading-tight">
+          {title}
+        </h1>
       </header>
 
       <div className="relative mb-2">
@@ -37,7 +52,9 @@ export function PaywallBanner({ title, heroImage, teaser, onSubscribe }: Paywall
       </div>
 
       <div className="mt-10 flex flex-col items-center gap-3 py-10 border-t border-foreground/10">
-        <p className="text-lg font-semibold text-foreground">Subscribe to read the full article</p>
+        <p className="text-lg font-semibold text-foreground">
+          Subscribe to read the full article
+        </p>
         <p className="text-sm text-muted">Free, instant, no email required</p>
         <button
           onClick={handleSubscribe}
