@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { rateLimit } from "@/lib/rate-limit";
+import { withRateLimit } from "@/lib/api-utils";
 
 const PRIVATE_KEY = process.env.BUILDER_PRIVATE_KEY ?? "";
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY ?? "";
@@ -203,22 +203,9 @@ const postBodySchema = z.object({
   category: z.string().trim().min(1).optional(),
 });
 
-function getRateLimitKey(request: NextRequest): string {
-  return request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-}
-
 export async function POST(request: NextRequest) {
-  const reqId = crypto.randomUUID();
-
-  const ip = getRateLimitKey(request);
-  const { allowed, retryAfter } = rateLimit(ip, 10, 60);
-  if (!allowed) {
-    console.error(`[${reqId}] Rate limit exceeded for IP ${ip} on POST /api/seed-articles`);
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429, headers: { "Retry-After": String(retryAfter ?? 60) } }
-    );
-  }
+  const { reqId, blocked } = withRateLimit(request, 10, 60, "POST /api/seed-articles");
+  if (blocked) return blocked;
 
   const authError = checkAuth(request);
   if (authError) return authError;
@@ -263,17 +250,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const reqId = crypto.randomUUID();
-
-  const ip = getRateLimitKey(request);
-  const { allowed, retryAfter } = rateLimit(ip, 10, 60);
-  if (!allowed) {
-    console.error(`[${reqId}] Rate limit exceeded for IP ${ip} on DELETE /api/seed-articles`);
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429, headers: { "Retry-After": String(retryAfter ?? 60) } }
-    );
-  }
+  const { reqId, blocked } = withRateLimit(request, 10, 60, "DELETE /api/seed-articles");
+  if (blocked) return blocked;
 
   const authError = checkAuth(request);
   if (authError) return authError;

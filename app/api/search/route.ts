@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { searchArticles } from "@/lib/builder";
-import { rateLimit } from "@/lib/rate-limit";
+import { withRateLimit } from "@/lib/api-utils";
 
 const querySchema = z.object({
   q: z.string().max(200).optional().default(""),
@@ -9,17 +9,8 @@ const querySchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const reqId = crypto.randomUUID();
-
-  const ip = request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-  const { allowed, retryAfter } = rateLimit(ip, 60, 60);
-  if (!allowed) {
-    console.error(`[${reqId}] Rate limit exceeded for IP ${ip} on /api/search`);
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429, headers: { "Retry-After": String(retryAfter ?? 60) } }
-    );
-  }
+  const { reqId, blocked } = withRateLimit(request, 60, 60, "/api/search");
+  if (blocked) return blocked;
 
   const parsed = querySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams));
   if (!parsed.success) {
