@@ -20,7 +20,7 @@ export function PaywallBanner({ title, heroImage, teaser, onSubscribe }: Paywall
     <article className="max-w-3xl mx-auto py-8">
       {heroImage && (
         <div className="relative w-full aspect-video mb-8 overflow-hidden rounded-lg">
-          <Image src={heroImage} alt={title} fill sizes="(max-width: 768px) 100vw, 768px" className="object-cover" priority />
+          <Image src={heroImage} alt={title} fill sizes="(max-width: 768px) 100vw, 768px" className="object-cover" quality={80} priority />
         </div>
       )}
 

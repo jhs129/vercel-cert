@@ -54,9 +54,9 @@ export default function CardImage({
           src={src}
           alt={alt}
           fill
-          loading="lazy"
           className="object-cover"
-          sizes="(max-width: 384px) 100vw, 384px"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
+          quality={80}
         />
       </div>
 

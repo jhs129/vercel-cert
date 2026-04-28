@@ -112,6 +112,7 @@ export function ArticleClient({
             fill
             sizes="(max-width: 1024px) 100vw, 984px"
             className="object-cover"
+            quality={80}
             priority
           />
         </div>
