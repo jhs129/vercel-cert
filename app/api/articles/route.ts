@@ -4,13 +4,13 @@ import { fetchArticles, fetchArticleCategories } from "@/lib/builder";
 import { rateLimit } from "@/lib/rate-limit";
 
 const querySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(50).catch(5),
+  limit: z.coerce.number().int().min(1).max(100).catch(5),
 });
 
 export async function GET(request: NextRequest) {
   const reqId = crypto.randomUUID();
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const ip = request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
   const { allowed, retryAfter } = rateLimit(ip, 60, 60);
   if (!allowed) {
     console.error(`[${reqId}] Rate limit exceeded for IP ${ip} on /api/articles`);

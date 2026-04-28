@@ -11,7 +11,7 @@ const querySchema = z.object({
 export async function GET(request: NextRequest) {
   const reqId = crypto.randomUUID();
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const ip = request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
   const { allowed, retryAfter } = rateLimit(ip, 60, 60);
   if (!allowed) {
     console.error(`[${reqId}] Rate limit exceeded for IP ${ip} on /api/search`);

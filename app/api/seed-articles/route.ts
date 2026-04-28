@@ -204,7 +204,7 @@ const postBodySchema = z.object({
 });
 
 function getRateLimitKey(request: NextRequest): string {
-  return request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  return request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
 }
 
 export async function POST(request: NextRequest) {
