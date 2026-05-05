@@ -33,7 +33,7 @@ const fetchArticle = cache(async (slug: string): Promise<Article | null> => {
   const token = process.env.API_BYPASS_TOKEN;
   const res = await fetch(`${API_BASE}/api/articles/${slug}`, {
     headers: token ? { "x-vercel-protection-bypass": token } : {},
-    cache: "no-store",
+    next: { revalidate: 60 },
   });
   if (!res.ok) return null;
   const json = await res.json() as { success: boolean; data: Article };
@@ -47,8 +47,14 @@ function parseInline(text: string): ReactNode[] {
     }
     const link = seg.match(/^\[(.+)\]\((.+)\)$/);
     if (link) {
+      const isExternal = /^https?:\/\//i.test(link[2]);
       return (
-        <a key={i} href={link[2]} target="_blank" rel="noopener noreferrer" className="text-accent underline hover:opacity-80">
+        <a
+          key={i}
+          href={link[2]}
+          {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          className="text-accent underline hover:opacity-80"
+        >
           {link[1]}
         </a>
       );

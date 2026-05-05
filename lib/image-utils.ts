@@ -2,6 +2,7 @@ import "server-only";
 import { getPlaiceholder } from "plaiceholder";
 
 const ALLOWED_BLUR_HOSTNAMES = new Set(["cdn.builder.io", "placehold.co"]);
+const ALLOWED_BLUR_HOSTNAME_SUFFIXES = [".public.blob.vercel-storage.com"];
 
 export function generateColorPlaceholder(r: number, g: number, b: number): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><rect width="1" height="1" fill="rgb(${r},${g},${b})"/></svg>`;
@@ -11,7 +12,11 @@ export function generateColorPlaceholder(r: number, g: number, b: number): strin
 export async function generateBlurPlaceholder(url: string): Promise<string> {
   try {
     const parsed = new URL(url);
-    if (parsed.protocol !== "https:" || !ALLOWED_BLUR_HOSTNAMES.has(parsed.hostname)) {
+    const allowed =
+      parsed.protocol === "https:" &&
+      (ALLOWED_BLUR_HOSTNAMES.has(parsed.hostname) ||
+        ALLOWED_BLUR_HOSTNAME_SUFFIXES.some((s) => parsed.hostname.endsWith(s)));
+    if (!allowed) {
       return generateColorPlaceholder(128, 128, 128);
     }
     const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
