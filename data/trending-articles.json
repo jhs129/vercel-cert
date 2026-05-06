@@ -1,0 +1,565 @@
+{
+    "success": true,
+    "data": [
+        {
+            "id": "6cshnJPCwdDgrropKxJDKT",
+            "title": "How Coxwave delivers GenAI value faster with Vercel",
+            "slug": "how-coxwave-delivers-genai-value-faster-with-vercel",
+            "excerpt": "Read more about Coxwave's journey to cutting deployment times by 85% and building AI-native products faster with Vercel",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "text": "[Coxwave](https://tryalign.ai/) helps enterprises build GenAI products that work at scale. With their consulting arm, AX, and their analytics platform, Align, they support some of the world’s most technically sophisticated companies, including Anthropic, Meta, Microsoft, and PwC."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Since the company’s founding in 2021, speed has been a defining trait. But speed doesn’t just mean fast models. For Coxwave, it means fast iteration, fast validation, and fast value delivery."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "To meet that bar, Coxwave reimagined their web app strategy with Next.js and Vercel."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "From monthly releases to multiple deploys a day"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Coxwave’s most pressing challenge is delivering value fast in a constantly shifting market. Traditional deployment cycles and infrastructure setups couldn't keep up."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "By choosing the Next.js stack and deploying on Vercel, they created an environment that can keep up with the innovative pace of GenAI."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Vercel’s [Preview Deployments](https://vercel.com/docs/deployments/environments), built-in CDN, and automatic scaling allow Coxwave to ship confidently and react in real time. Feature testing happens in production-like environments without disrupting live traffic. Hotfixes can be pushed the same day and new experiments can go live within hours."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The results are concrete:"
+                },
+                {
+                    "type": "unordered-list",
+                    "items": [
+                        "Deployment times were reduced by 85%",
+                        "Production deploy frequency jumped from once a week to twice per day",
+                        "Experiment-to-feedback cycles shrank dramatically",
+                        "52% decrease in production recovery time with [Instant Rollback](https://vercel.com/docs/instant-rollback)"
+                    ]
+                },
+                {
+                    "type": "paragraph",
+                    "text": "For Coxwave, these improvements weren’t just technical. They gave the team room to think, validate, and adapt faster than their competitors locked into slower infrastructure."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "AI-native features, tested in real time"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "When Coxwave launched Exploration Copilot, their AI assistant for product teams, Vercel made it possible to prototype and release at full speed."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "[Preview Environments](https://vercel.com/docs/deployments/environments) let the team build and test multiple LLM-powered variations in parallel, without any risk to production."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "In parallel, the [AI SDK](https://ai-sdk.dev/), with features like the `useChat` hook, gave the team a fast starting point for the conversational functionality, handling streaming, state, and UI updates out of the box, so they could skip boilerplate and get to user feedback faster."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "These tools combined to accelerate their entire cycle: from idea, to prototype, to production-ready product."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "Building without infrastructure drag"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Before Vercel, Coxwave’s Next.js apps were deployed using CloudFront + S3. That worked for static sites but not for the dynamic, server-rendered needs of modern GenAI apps. Every environment setup required additional overhead and deploying fixes was slow and brittle."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "By default, Coxwave now gets consistency between dev and production, simplified team ownership, and serverless compute without the operational load. The frontend team owns the full deployment lifecycle, and every branch gets its own environment for testing."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "Ship like Coxwave"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Coxwave plans to continue use of the Vercel and Next.js stack across upcoming projects. The setup has proven its value not just for development velocity, but for customer experience and product confidence."
+                }
+            ],
+            "category": "customers",
+            "author": {
+                "name": "Peri Langlois",
+                "avatar": ""
+            },
+            "image": "https://i8qy5y6gxkdgdcv9.public.blob.vercel-storage.com/news/how-coxwave-delivers-genai-value-faster-with-vercel.png",
+            "publishedAt": "2024-08-13T00:00:00.000-05:00",
+            "featured": false,
+            "tags": [
+                "Vercel AI Cloud"
+            ]
+        },
+        {
+            "id": "7mri0gvJweeYRW2Cteirne",
+            "title": " Helly Hansen migrated to Vercel and drove 80% Black Friday growth",
+            "slug": "helly-hansen-migrated-to-vercel-and-drove-80-black-friday-growth",
+            "excerpt": "The 150-year-old Norwegian brand leveraged Next.js and Vercel to achieve 30%+ conversion lift while competing against industry titans",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "text": "Founded in 1877, Helly Hansen is a global leader in technical apparel, but its digital experience wasn't living up to its legacy. Operating across 38 global markets with multiple brands (including [HellyHansen.com](https://www.hellyhansen.com/), [HHWorkwear.com](https://www.hhworkwear.com/), and [Musto.com](https://www.musto.com/)), the company was being held back by an outdated tech stack that slowed site speeds and frustrated customers."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Through an incremental migration to Next.js and Vercel, Helly Hansen improved Core Web Vitals from red to green, increased developer agility, and delivered a record-breaking Black Friday Cyber Monday, building a foundation for future innovation."
+                },
+                {
+                    "type": "image",
+                    "src": "",
+                    "alt": ""
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "Core performance issues destroying customer experience"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Helly Hansen's performance issues stemmed from its architecture. The Adobe Commerce PWA relied on client-side rendering for personalization and A/B testing, triggering heavy scripts on every load. This blocked rendering and caused major layout shifts."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The impact was severe: Core Web Vitals failed across the board, load times exceeded 4 seconds, and Cumulative Layout Shift spiked above 2.8. These issues degraded customer experience, hurt conversion on marketing spend, and jeopardized peak revenue events like Black Friday Cyber Monday."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "Incremental migration starting with checkout"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Helly Hansen took an [incremental migration approach with Vercel](https://vercel.com/blog/incremental-migrations), proving value step by step instead of risking a single high-stakes launch. Working closely with our professional services team, they first completed an architecture review to define the optimal rendering and caching strategy."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The team chose to begin with checkout pages rather than the homepage, isolating their most critical conversion point while avoiding disruption to complex marketing attribution systems. Using server-side experimentation, they A/B tested different checkout flows in real-time. [The Vercel CDN](https://vercel.com/docs/cdn) ensured these critical pages loaded quickly for customers worldwide, while [Vercel Functions](https://vercel.com/docs/functions) ensured automatic scaling during traffic spikes."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "From red to green Core Web Vitals"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The biggest technical change was moving from client-side to server-side rendering using Vercel's Edge Network. This directly addressed the root cause of their performance issues. Within five months, their Core Web Vitals transformed from all red to all green across every metric."
+                },
+                {
+                    "type": "unordered-list",
+                    "items": [
+                        "**Load times **dropped from over 4 seconds to a consistent 1.8-2 seconds",
+                        "**Cumulative Layout Shift **was virtually eliminated"
+                    ]
+                },
+                {
+                    "type": "paragraph",
+                    "text": "By focusing the initial migration on a single part of the customer journey, Helly Hansen could precisely measure Next.js impact. Through [Vercel Web Analytics](https://vercel.com/docs/analytics), load times, conversion rates, and Core Web Vitals became quantifiable proof points that generated the evidence needed to justify continued investment and proceed with global rollout in under six months."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "Black Friday instability threatening peak revenue"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Q4 represents 55% of annual revenue for this seasonal outdoor business, making Black Friday Cyber Monday a high-stress, high-risk event. Pre-Vercel Black Fridays meant high stress, maintenance issues, and frequent site outages during their most critical revenue period."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "Leveraging Next.js and Vercel's performance and reliability infrastructure"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Next.js automatically optimized product data and pricing information by leveraging [Vercel Data Cache](https://vercel.com/docs/edge-cache), while [Incremental Static Regeneration (ISR)](https://vercel.com/docs/incremental-static-regeneration) and cache shielding protected performance at the most critical moments, maintaining consistently strong web performance even during peak traffic."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Hosting on Vercel delivered the performance and stability to transform Black Friday from a high-stress event into a growth opportunity. When the team identified third-party scripts slowing the site during Black Friday, they executed a low-risk deploy to hard-code a fix during a code freeze, a move impossible on their old platform."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "Record-breaking Black Friday performance"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The site's speed instantly recovered, securing a record-breaking sales period with:"
+                },
+                {
+                    "type": "unordered-list",
+                    "items": [
+                        "**80% year-over-year growth **with zero downtime",
+                        "**2x lift in conversion rates**, allowing them to increase their marketing spend mid-campaign three times because it was so profitable"
+                    ]
+                },
+                {
+                    "type": "paragraph",
+                    "text": "This ability to scale marketing spend in real-time turned their high-performing site into a growth engine, bringing peace of mind, structured planning, and zero major issues."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "Limited development velocity and experimentation capabilities"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The old platform severely limited testing velocity, allowing only one A/B test per month. This constrained their ability to optimize the customer experience and respond quickly to market demands."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "Building a modern, API-first foundation"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "By migrating to Next.js and Vercel, Helly Hansen established a modern, API-first foundation for their ecommerce platform. This transition to server-side rendering (SSR) enabled them to launch a full-scale server-side testing program with [feature flags](https://vercel.com/docs/feature-flags) to continuously optimize the customer experience."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "With this high-performance infrastructure in place, they improved developer velocity and deployed [**Constructor.io**](http://constructor.io/) to drive personalization in just 11 weeks."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "Accelerated growth and innovation"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The team increased their testing velocity dramatically, running 5-6 A/B tests per sprint compared to just one per month previously. This modern foundation delivered:"
+                },
+                {
+                    "type": "unordered-list",
+                    "items": [
+                        "**21% ecommerce growth **while others in the industry remained flat",
+                        "Highly personalized customer experience at near-zero latency within a year of launch",
+                        "Proof that speed and personalization can coexist without compromise"
+                    ]
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "Leadership advice for CDOs and CTOs"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Reflecting on the project, CDO of Helly Hansen, Anshika Jain offered advice for other Chief Digital Officers and Chief Technical Officers considering a digital transformation:"
+                },
+                {
+                    "type": "unordered-list",
+                    "items": [
+                        "**\"Prioritize speed as your foundation\"**- Speed is a gift that never stops giving. Faster experiences not only convert better, they unlock personalization, experimentation, and rapid feature delivery. Vercel isn’t the finish line; it’s the starting point. Invest early in infrastructure that guarantees fast, reliable experiences",
+                        "**“Test, learn, and scale”- **Don’t swing for the fences on day one. Use small, data-driven experiments to prove value, build momentum, and de-risk larger transformations. Scaling is easier, and more defensible when you have evidence in hand",
+                        "**“Embrace change as the norm rather than the exception”- **Change isn’t a phase, it’s the new operating system. Organize for agility, expect resistance, and make adaptability muscle memory. The winners are those who normalize rapid response to constant change"
+                    ]
+                },
+                {
+                    "type": "paragraph",
+                    "text": "By partnering with Vercel, Helly Hansen has not only solved its immediate performance challenges but has built a performant, scalable, and future-proof foundation that allows them to innovate and outperform their competition for years to come."
+                }
+            ],
+            "category": "customers",
+            "author": {
+                "name": "Alina Weinstein",
+                "avatar": ""
+            },
+            "image": "https://i8qy5y6gxkdgdcv9.public.blob.vercel-storage.com/news/helly-hansen-migrated-to-vercel-and-drove-80-black-friday-growth.png",
+            "publishedAt": "2025-09-15T00:00:00.000-05:00",
+            "featured": true,
+            "tags": [
+                "Vercel AI Cloud"
+            ]
+        },
+        {
+            "id": "59K4gZ95jdxBeHlnnNFqmm",
+            "title": "Never drop the illusion: How Frame.io builds fluid user experiences",
+            "slug": "never-drop-the-illusion-how-frame-io-builds-fluid-user-experiences",
+            "excerpt": "Frame.io's users \"see in milliseconds,\" so every interaction, animation, and frame within a user's web experience matters.",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "text": "When Hollywood giants and global brands collaborate on video, they demand a seamless, high-performing experience — and [Frame.io](https://frame.io/), an Adobe company, delivers."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Their users work with high-quality video content and operate on a different level of perception—they \"see in milliseconds\" and sweat the details. To meet the needs of their users, Frame.io commits itself to delivering web applications that feel as responsive and powerful as their desktop counterparts."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "This vision led them to move away from the popular \"make it work, make it right, make it fast\" approach and find a solution that works for them and their users."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "**Seeing in milliseconds required a new approach**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Seeing in milliseconds highlights the understanding that even the slightest delay or dropped frame can disrupt the creative flow for video pros."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "This realization led Frame.io to embrace a new guiding principle: \"How it feels = how it works.\" If the application doesn't feel good to use, it’s just as bad as when a feature isn’t functioning correctly."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Frame.io refers to their approach to building performant UIs as \"Fluid UI.\" Influenced by Apple’s [Designing Fluid Interfaces](https://developer.apple.com/videos/play/wwdc2018/803), Fluid UI rests on three core principles: instant, smooth, and coordinated."
+                },
+                {
+                    "type": "unordered-list",
+                    "items": [
+                        "**Instant: **The UI must respond to user input within 100ms, providing immediate feedback that their action has been registered. To achieve this, they leverage React features like `useState`, `useOptimistic`, and the Next.js Router Cache, while minimizing unnecessary re-renders with `useMemo` and `useCallback`",
+                        "**Smooth: **All animations should run at a consistent 60 fps, mimicking the fluidity of natural motion and creating a visually pleasing experience. This involves utilizing React's `useTransition` Hook, opting for CSS-only solutions whenever possible, and building stable UI components that minimize DOM manipulation",
+                        "**Coordinated: **UI elements should move in sync, creating a cohesive and intuitive flow. Transitions and animations should feel like a natural extension of the user's actions. This requires carefully orchestrating animations and transitions for related UI elements, ensuring they occur in sync and contribute to a cohesive user experience"
+                    ]
+                },
+                {
+                    "type": "paragraph",
+                    "text": "To ensure these principles translate into a consistently smooth user experience, Frame.io adopted Next.js [App Router](https://nextjs.org/docs/app), and uses Vercel and their own platform to constantly monitor application performance."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Vercel's automatic [Preview Deployments](https://vercel.com/docs/deployments/preview-deployments) allow developers to evaluate the performance impact of code changes in a production-like environment, catching and addressing regressions early on. Previously, waiting for previews could take Frame.io up to 40 minutes. But Vercel significantly reduces this time by over 6x to around 6 minutes, enabling faster iteration cycles and quicker identification of potential issues."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The team at Frame.io believes in the power of dogfooding, so they use Frame.io to analyze and improve the performance of Frame.io itself. By uploading screen recordings and analyzing them frame by frame, they can pinpoint even the slightest performance bottlenecks and address them directly."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "This constant feedback loop ensures that the team implements Fluid UI principles effectively and that the result is a truly seamless user experience."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "**Engineering for scale and performance**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Building for Fluid UI isn't just about adhering to a set of principles; it demands a fundamental shift in mindset and a dedicated framework that permeates the entire development process."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Frame.io approaches this challenge with a forward-thinking mentality, embodied in an \"instant and infinity\" philosophy: They design for scalability from day one, anticipating massive datasets and building their architecture to handle millions of items without breaking a sweat. This laser focus on user experience is further enabled by tools like Vercel, which handle critical performance optimizations out of the box."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Features like Vercel's global [Edge Network](https://vercel.com/docs/edge-network/overview), [static asset revalidation](https://vercel.com/docs/incremental-static-regeneration), and easy configuration of cache headers allow Frame.io's product engineers to focus on building features rather than spending weeks configuring infrastructure with the Site Reliability Engineering (SRE) team. This frees up valuable engineering resources to concentrate on delivering the best possible user experience."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "But it's not just about handling scale—it's also about prioritizing the right work. Frame.io understands that every task impacts the user experience, so they prioritize ruthlessly, focusing on what matters most to their users. This often means deferring noncritical tasks, ensuring that the application remains snappy and responsive even under heavy load."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "To further enhance the user experience, Frame.io embraces anticipation. They preload resources and data, ensuring a smoother, more responsive experience that feels almost instantaneous. And to keep the UI humming along smoothly, they offload tasks from the main thread whenever possible, preventing UI jank (which impacts [core web vitals](https://vercel.com/resources/how-vercel-improves-your-websites-search-engine-ranking) like Cumulative Layout Shift) and maintaining that crucial responsiveness."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "The job's never done: continuous improvement and minimizing downtime"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Frame.io also recognizes the importance of continuous improvement, so they utilize [feature flags](https://vercel.com/blog/feature-flags) to control the release of new features, ensuring they meet performance standards before being unleashed upon the world, while regular audits with [Vercel Speed Insights](https://vercel.com/docs/speed-insights) or [Conformance](https://vercel.com/docs/workflow-collaboration/conformance) help identify and address regressions to ensure the application remains performant over time."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "This commitment to continuous improvement extends to deployment practices as well. With thousands of users relying on Frame.io at any given time, zero-downtime deployments are crucial."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Vercel's [Skew Protection](https://vercel.com/docs/deployments/skew-protection) feature helps mitigate the risks associated with deploying at scale, ensuring a seamless transition for all users and minimizing the potential for disruption. This allows Frame.io to confidently ship updates knowing that their users will experience minimal, if any, interruption."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Frame.io doesn't shy away from complex performance challenges. They allocate dedicated resources and time to tackle these head-on, knowing that conquering these challenges is essential to delivering a truly exceptional user experience."
+                },
+                {
+                    "type": "heading",
+                    "level": 2,
+                    "text": "Shared expectations and dedicated resources: the keys to success"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Frame.io recognizes that Fluid UI is crucial for a great user experience, especially for demanding applications. They prioritize performance by tracking metrics, identifying bottlenecks, and empowering developers to create a seamless experience."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "This focus allows users to focus on what matters: their work. Other teams can learn from this approach, building web applications that feel as responsive and powerful as desktop software."
+                }
+            ],
+            "category": "customers",
+            "author": {
+                "name": "Dan Fein",
+                "avatar": ""
+            },
+            "image": "https://i8qy5y6gxkdgdcv9.public.blob.vercel-storage.com/news/never-drop-the-illusion-how-frame-io-builds-fluid-user-experiences.png",
+            "publishedAt": "2024-06-11T00:00:00.000-05:00",
+            "featured": false,
+            "tags": [
+                "Vercel AI Cloud"
+            ]
+        },
+        {
+            "id": "2A7FgLAxwXFMqQnyNDxwgW",
+            "title": "Transforming customer support with AI: How Vercel decreased tickets by 31%",
+            "slug": "transforming-customer-support-with-ai-how-vercel-decreased-tickets-by-31",
+            "excerpt": "At Vercel, we integrated AI into our support workflow. Our AI agent reduced human-handled tickets by 31%, allowing us to maintain high support standards while serving a growing customer base.",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "text": "[McKinsey's](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai) latest AI survey shows 65% of organizations now regularly use AI — nearly double from just ten months ago, with many using it to increase efficiency in critical areas like customer support.At Vercel, we integrated AI into our support workflow. Our AI agent reduced human-handled tickets by 31%, allowing us to maintain high support standards while serving a growing customer base."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "**The challenge: balancing support quality with growth**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Customer support teams routinely handle a diverse range of customer inquiries, many of which involve repeatable processes. These can range from simple tasks like guiding customers to specific documentation pages, to helping customers through the process of configuring their domain."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The landscape of customer support is pointing organizations toward building AI-powered chatbots as a critical component of their customer support strategy. According to [Gartner](https://www.gartner.com/en/newsroom/press-releases/2022-07-27-gartner-predicts-chatbots-will-become-a-primary-customer-service-channel-within-five-years), by 2027, chatbots will become the primary customer service channel for roughly a quarter of organizations. Businesses are embracing AI, motivated by several factors: rising customer expectations for instant, 24/7 support; and the need for cost-effective scaling of support operations."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "This correlation underscores the potential of AI as a powerful tool for enhancing customer experience while optimizing operational efficiency. The key to realizing these benefits lies in thoughtful implementation, and ensuring that AI solutions complement rather than replace human expertise in customer support. Organizations can find efficiencies with AI, and leave support engineers to handle the complex, context-rich inquiries that require deeper expertise."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "**The solution: A measured approach to AI implementation**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "At Vercel, we developed an AI-powered agent to seamlessly integrate with our existing support workflows. Working with our implementation partner, Markprompt, we replaced our support form with a simple, open-ended question: \"How can we help?\" Our AI-powered agent, powered by a Large Language Model (LLM), leverages a comprehensive, multi-source knowledge base that includes our website content, documentation, Next.js examples, and help articles. This allows us to provide immediate, accurate responses to a wide range of customer queries."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The AI assistant’s capabilities extend beyond simple question-answering. It can engage in follow-up questions, allowing it to handle increasingly complex queries over time. And, if the AI can't fully resolve an issue, it smoothly transitions to human support by pre-filling a support form, eliminating repetitive data entry for customers."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "**Tips for building a smarter support system**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Throughout the development process, we prioritized customer experience and choice, guided by these key insights:"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "**Insight 1**: **Take an iterative approach**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Rather than implementing a solution quickly, we took a measured, iterative approach, prioritizing our customers' experience every step of the way. Our initial AI implementation focused on providing immediate answers to customer queries surfacing objective, foundational answers and then providing more context if needed by the customer."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "**Insight 2:** **Test internally first**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "As we do with everything from internal tools to the products we offer customers, we used our technology in-house first. By testing the AI assistant internally before rolling it out to customers, we addressed compliance and security concerns head-on, particularly regarding access to sensitive customer data. It also ensured we met our high standards for customer experience."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "**Insight 3: Gradual rollout with A/B testing**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "We began with a 50% A/B test using [Edge Middleware](https://vercel.com/docs/functions/edge-middleware), allowing us to safely test our hypothesis of improved support through AI in the real-world. The results were overwhelmingly positive: a 16% reduction in support tickets over a period of two weeks, right from the first iteration. This validation gave us the confidence to ramp up to a 100% rollout and evolve the AI-powered agent into a more interactive, conversational interface."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "**Insight 4: Prioritize customer experience and brand integrity**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Throughout the process, we remained acutely aware of our responsibility to protect our brand and deliver exceptional service. A key feature of our implementation was the constant presence of a clear \"Create Case\" option. At every step, customers had the ability to opt out of the AI experience and connect with a human support engineer, ensuring they always felt in control of their support experience. This approach empowered customers, created a valuable feedback loop, and enabled rapid improvements. Instead of deploying a basic AI chatbot quickly, we developed a sophisticated, customer-centric AI solution that respects customer preferences while leveraging advanced technology."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "**Benefits and results**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "This new system offered two key advantages: saving customers time and being language-agnostic, allowing customers to describe their issues in any language. It successfully interpreted, understood, answered, and resolved 31% of incoming tickets, freeing up the CSE team to focus on providing the best possible customer experience."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "The benefits extended beyond these initial wins:"
+                },
+                {
+                    "type": "unordered-list",
+                    "items": [
+                        "42% reduction in first response time for customers",
+                        "Significantly improved CSE job satisfaction",
+                        "Enhanced documentation and product interfaces"
+                    ]
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Vercel's approach wasn't just about answering questions and closing tickets; it was about learning and improving. By analyzing resolved tickets, we identified areas for enhancement in documentation, product interface, and the product itself. We also created a data flywheel, where each interaction improved the AI's performance, leading to better outcomes over time and a virtuous cycle of improvement."
+                },
+                {
+                    "type": "heading",
+                    "level": 3,
+                    "text": "**How to get started at your company**"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Vercel empowers developers to harness the power of AI, regardless of their team's expertise. Now is the perfect time for your organization to explore AI-driven solutions – here's how you can get started and transform your applications with Vercel's powerful ecosystem:"
+                },
+                {
+                    "type": "ordered-list",
+                    "items": [
+                        "**Explore AI applications: **Build chatbots, writing tools, generative AI apps, or virtual assistants using tools like [Next.js](https://nextjs.org/) and the [Vercel AI SDK](https://sdk.vercel.ai/docs).",
+                        "**Prototype and collaborate: **Rapidly iterate with our [DX Platform](https://vercel.com/products/previews), featuring powerful tools like feature flags and preview URLs for seamless, low-risk experimentation.",
+                        "[**Quickstart templates**](https://vercel.com/templates?type=ai): Deploy an AI app in seconds with pre-built templates, including a chatbot template to get you started.",
+                        "[**Launch AI projects at scale**](https://vercel.com/blog/how-to-build-scalable-ai-applications)**: **Our fully [managed infrastructure](https://vercel.com/products/rendering) scales effortlessly and delivers ultra-performant experiences for users."
+                    ]
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Vercel’s story aligns with the broader trends identified in the McKinsey survey, where organizations report both cost reductions and revenue increases in business units deploying gen AI. Our experience demonstrates that when implemented thoughtfully, AI can be a powerful tool for enhancing customer experience while optimizing operational efficiency. Whether you're an AI-first company or looking to enhance existing products, Vercel provides the tools and knowledge to help you revolutionize your customer support and beyond with AI."
+                }
+            ],
+            "category": "community",
+            "author": {
+                "name": "Alina Weinstein",
+                "avatar": ""
+            },
+            "image": "https://i8qy5y6gxkdgdcv9.public.blob.vercel-storage.com/news/transforming-customer-support-with-ai-how-vercel-decreased-tickets-by-31.png",
+            "publishedAt": "2025-09-03T00:00:00.000-05:00",
+            "featured": false,
+            "tags": [
+                "Vercel AI Cloud"
+            ]
+        }
+    ]
+}

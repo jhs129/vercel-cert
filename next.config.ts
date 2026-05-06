@@ -9,6 +9,7 @@ const nextConfig: NextConfig = BuilderDevTools()({
     remotePatterns: [
       { protocol: "https", hostname: "placehold.co" },
       { protocol: "https", hostname: "cdn.builder.io" },
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },
 });
