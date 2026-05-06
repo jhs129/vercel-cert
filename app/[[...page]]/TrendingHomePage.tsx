@@ -30,7 +30,7 @@ export default async function TrendingHomePage() {
   const articles = await fetchTrendingArticles();
 
   const articlesWithBlur = await Promise.all(
-    articles.map(async (article) => ({
+    articles.slice(0, 3).map(async (article) => ({
       ...article,
       blurDataURL: article.image ? await generateBlurPlaceholder(article.image) : undefined,
     }))
