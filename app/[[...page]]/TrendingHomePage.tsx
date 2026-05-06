@@ -37,7 +37,7 @@ export default async function TrendingHomePage() {
   );
 
   return (
-    <main className="py-8">
+    <section className="py-8">
       <h2 className="text-3xl font-bold mb-8">Trending Articles</h2>
       {articlesWithBlur.length === 0 ? (
         <p className="text-muted">No articles available right now. Check back soon.</p>
@@ -56,6 +56,6 @@ export default async function TrendingHomePage() {
           ))}
         </div>
       )}
-    </main>
+    </section>
   );
 }
