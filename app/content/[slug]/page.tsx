@@ -4,40 +4,13 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
+import { fetchArticleBySlug, type Article, type ContentBlock } from "@/lib/articles-api";
 
-const API_BASE = process.env.API_BASE ?? "https://vercel-daily-news-api.vercel.app";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";
 
-interface ContentBlock {
-  type: "paragraph" | "unordered-list";
-  text?: string;
-  items?: string[];
-}
-
-interface Article {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: ContentBlock[];
-  category: string;
-  author: { name: string; avatar: string };
-  image: string;
-  publishedAt: string;
-  featured: boolean;
-  tags: string[];
-}
-
 const fetchArticle = cache(async (slug: string): Promise<Article | null> => {
-  const token = process.env.API_BYPASS_TOKEN;
-  const res = await fetch(`${API_BASE}/api/articles/${slug}`, {
-    headers: token ? { "x-vercel-protection-bypass": token } : {},
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) return null;
-  const json = await res.json() as { success: boolean; data: Article };
-  return json.success ? json.data : null;
+  return fetchArticleBySlug(slug);
 });
 
 function parseInline(text: string): ReactNode[] {
@@ -101,14 +74,18 @@ export default async function ArticlePage({
   const article = await fetchArticle(slug);
   if (!article) notFound();
 
-  const formattedDate = new Date(article.publishedAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
+  const { author = { name: "", avatar: "" }, publishedAt = "", tags = [], content = [] } = article;
 
-  const authorInitials = article.author.name
+  const formattedDate = publishedAt
+    ? new Date(publishedAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      })
+    : "";
+
+  const authorInitials = author.name
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -147,10 +124,10 @@ export default async function ArticlePage({
         </h1>
 
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          {article.author.avatar ? (
+          {author.avatar ? (
             <Image
-              src={article.author.avatar}
-              alt={article.author.name}
+              src={author.avatar}
+              alt={author.name}
               width={32}
               height={32}
               className="rounded-full"
@@ -160,14 +137,14 @@ export default async function ArticlePage({
               {authorInitials}
             </div>
           )}
-          <span className="text-sm text-muted">{article.author.name}</span>
+          <span className="text-sm text-muted">{author.name}</span>
           <span className="text-muted" aria-hidden="true">·</span>
-          <time className="text-sm text-muted" dateTime={article.publishedAt}>{formattedDate}</time>
+          <time className="text-sm text-muted" dateTime={publishedAt}>{formattedDate}</time>
         </div>
 
-        {article.tags.length > 0 && (
+        {tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {article.tags.map((tag) => (
+            {tags.map((tag) => (
               <span key={tag} className="text-xs px-2 py-1 rounded-full border border-border text-muted">
                 {tag}
               </span>
@@ -177,7 +154,7 @@ export default async function ArticlePage({
       </header>
 
       <div className="prose max-w-none space-y-4">
-        {article.content.map((block, i) => {
+        {content.map((block, i) => {
           if (block.type === "paragraph" && block.text) {
             return (
               <p key={i} className="text-foreground leading-relaxed">
