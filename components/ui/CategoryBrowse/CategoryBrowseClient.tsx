@@ -6,7 +6,6 @@ import type { Article, Category } from "@/lib/articles-api";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 import { ArticleHit } from "@/components/ui/ArticleHit";
 import SearchEmptyState from "@/components/ui/SearchEmptyState";
-import SearchLoadingState from "@/components/ui/SearchLoadingState";
 import type { Themeable } from "@/lib/types";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 
@@ -75,61 +74,72 @@ export default function CategoryBrowseClient({
   return (
     <div className={`theme-${theme} flex flex-col gap-6 p-6`}>
       {title && <h2 dangerouslySetInnerHTML={{ __html: sanitizeHtml(title) }} />}
-      <SearchLoadingState isLoading={isLoading} />
-      {!isLoading && (
-        <>
-          <CategoryFilter
-            categories={categories}
-            activeCategory={activeCategory}
-            onCategoryChange={handleCategoryChange}
-          />
-          {paged.length === 0 ? (
-            <SearchEmptyState
-              query={activeCategory ?? ""}
-              onClearSearch={() => handleCategoryChange(null)}
+
+      {categories.length > 0 && (
+        <CategoryFilter
+          categories={categories}
+          activeCategory={activeCategory}
+          onCategoryChange={handleCategoryChange}
+        />
+      )}
+
+      {isLoading ? (
+        <div role="status" aria-label="Loading articles" className="flex flex-col gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2 border-b border-border pb-4 animate-pulse">
+              <div className="h-5 w-3/4 rounded bg-muted/30" />
+              <div className="h-3 w-1/4 rounded bg-muted/30" />
+              <div className="h-3 w-full rounded bg-muted/30" />
+              <div className="h-3 w-5/6 rounded bg-muted/30" />
+            </div>
+          ))}
+        </div>
+      ) : paged.length === 0 ? (
+        <SearchEmptyState
+          query={activeCategory ?? ""}
+          onClearSearch={() => handleCategoryChange(null)}
+        />
+      ) : (
+        <div className="flex flex-col gap-4">
+          {paged.map((article) => (
+            <ArticleHit
+              key={article.id}
+              title={article.title}
+              slug={article.slug}
+              publishDate={
+                article.publishedAt
+                  ? new Date(article.publishedAt).getTime()
+                  : undefined
+              }
+              description={article.excerpt}
+              categories={article.category ? [article.category] : undefined}
             />
-          ) : (
-            <div className="flex flex-col gap-4">
-              {paged.map((article) => (
-                <ArticleHit
-                  key={article.id}
-                  title={article.title}
-                  slug={article.slug}
-                  publishDate={
-                    article.publishedAt
-                      ? new Date(article.publishedAt).getTime()
-                      : undefined
-                  }
-                  description={article.excerpt}
-                  categories={article.category ? [article.category] : undefined}
-                />
-              ))}
-            </div>
-          )}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4">
-              <button
-                type="button"
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-                className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
-              >
-                Previous
-              </button>
-              <span className="text-sm text-muted">
-                {page} of {totalPages}
-              </span>
-              <button
-                type="button"
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </>
+          ))}
+        </div>
+      )}
+
+      {!isLoading && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4">
+          <button
+            type="button"
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-muted">
+            {page} of {totalPages}
+          </span>
+          <button
+            type="button"
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+            className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   );
