@@ -45,3 +45,36 @@ export async function fetchArticleBySlug(slug: string): Promise<Article | null> 
   const json = (await res.json()) as { success: boolean; data: Article };
   return json.success ? json.data : null;
 }
+
+export interface Category {
+  slug: string;
+  name: string;
+  articleCount: number;
+}
+
+export async function fetchCategories(): Promise<Category[]> {
+  try {
+    const res = await newsFetch("/api/categories");
+    if (!res.ok) return [];
+    const json = (await res.json()) as { success: boolean; data: Category[] };
+    return json.success ? json.data : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchArticlesByCategory(
+  category?: string,
+  limit = 100
+): Promise<Article[]> {
+  try {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (category) params.set("category", category);
+    const res = await newsFetch(`/api/articles?${params}`);
+    if (!res.ok) return [];
+    const json = (await res.json()) as { success: boolean; data: Article[] };
+    return json.success ? json.data : [];
+  } catch {
+    return [];
+  }
+}

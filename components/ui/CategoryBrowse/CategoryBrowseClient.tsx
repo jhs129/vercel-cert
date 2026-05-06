@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import type { CmsArticle } from "@/lib/cms-models";
+import type { Article } from "@/lib/articles-api";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 import { ArticleHit } from "@/components/ui/ArticleHit";
 import SearchEmptyState from "@/components/ui/SearchEmptyState";
@@ -11,22 +11,16 @@ import type { Themeable } from "@/lib/types";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 
 const PAGE_SIZE = 10;
-const MAX_ARTICLES = 100;
-
-interface CategoryItem {
-  label: string;
-  value: string;
-}
 
 interface CategoryBrowseClientProps extends Themeable {
   title?: string;
-  categories?: CategoryItem[];
+  categories: string[];
 }
 
 export default function CategoryBrowseClient({
   title = "Browse Articles",
   theme = "light",
-  categories: categoriesProp,
+  categories,
 }: CategoryBrowseClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -34,8 +28,7 @@ export default function CategoryBrowseClient({
 
   const activeCategory = searchParams.get("category");
 
-  const [articles, setArticles] = useState<CmsArticle[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
 
@@ -44,19 +37,18 @@ export default function CategoryBrowseClient({
   }, [activeCategory]);
 
   useEffect(() => {
-    const configuredCategories = Array.isArray(categoriesProp)
-      ? categoriesProp.filter((c) => c.value !== "all").map((c) => c.value)
-      : [];
+    setIsLoading(true);
+    const params = new URLSearchParams({ limit: "100" });
+    if (activeCategory) params.set("category", activeCategory);
 
-    fetch(`/api/articles?limit=${MAX_ARTICLES}`)
+    fetch(`/api/articles-by-category?${params}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then(({ articles, categories }: { articles: CmsArticle[]; categories: string[] }) => {
+      .then(({ articles }: { articles: Article[] }) => {
         setArticles(articles);
-        setCategories(configuredCategories.length > 0 ? configuredCategories : categories);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
-  }, []); // categoriesProp is a CMS-set prop, stable at mount
+  }, [activeCategory]);
 
   const handleCategoryChange = (cat: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -69,12 +61,8 @@ export default function CategoryBrowseClient({
     router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
   };
 
-  const filtered = activeCategory
-    ? articles.filter((a) => a.data.categories?.includes(activeCategory))
-    : articles;
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.ceil(articles.length / PAGE_SIZE);
+  const paged = articles.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className={`theme-${theme} flex flex-col gap-6 p-6`}>
@@ -97,11 +85,15 @@ export default function CategoryBrowseClient({
               {paged.map((article) => (
                 <ArticleHit
                   key={article.id}
-                  title={article.data.title ?? ""}
-                  slug={article.data.slug ?? ""}
-                  publishDate={article.data.publishDate}
-                  description={article.data.metadata?.description}
-                  categories={article.data.categories}
+                  title={article.title}
+                  slug={article.slug}
+                  publishDate={
+                    article.publishedAt
+                      ? new Date(article.publishedAt).getTime()
+                      : undefined
+                  }
+                  description={article.excerpt}
+                  categories={article.category ? [article.category] : undefined}
                 />
               ))}
             </div>
