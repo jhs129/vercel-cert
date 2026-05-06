@@ -5,7 +5,7 @@ import { SubscriptionIndicator } from "@/components/ui/SubscriptionIndicator";
 
 const DEFAULT_LINKS: NavLink[] = [
   { href: "/", label: "Home" },
-  { href: "/search", label: "Search" },
+  { href: "/browse", label: "Browse" },
 ];
 
 export function Header({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
