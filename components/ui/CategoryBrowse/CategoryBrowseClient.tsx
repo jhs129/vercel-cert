@@ -2,31 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import type { CmsArticle } from "@/lib/cms-models";
+import type { Article } from "@/lib/articles-api";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 import { ArticleHit } from "@/components/ui/ArticleHit";
 import SearchEmptyState from "@/components/ui/SearchEmptyState";
-import SearchLoadingState from "@/components/ui/SearchLoadingState";
 import type { Themeable } from "@/lib/types";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 
 const PAGE_SIZE = 10;
-const MAX_ARTICLES = 100;
-
-interface CategoryItem {
-  label: string;
-  value: string;
-}
 
 interface CategoryBrowseClientProps extends Themeable {
   title?: string;
-  categories?: CategoryItem[];
 }
 
 export default function CategoryBrowseClient({
   title = "Browse Articles",
   theme = "light",
-  categories: categoriesProp,
 }: CategoryBrowseClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -34,7 +25,7 @@ export default function CategoryBrowseClient({
 
   const activeCategory = searchParams.get("category");
 
-  const [articles, setArticles] = useState<CmsArticle[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -44,19 +35,22 @@ export default function CategoryBrowseClient({
   }, [activeCategory]);
 
   useEffect(() => {
-    const configuredCategories = Array.isArray(categoriesProp)
-      ? categoriesProp.filter((c) => c.value !== "all").map((c) => c.value)
-      : [];
+    setIsLoading(true);
+    const params = new URLSearchParams({ limit: "100" });
+    if (activeCategory) params.set("category", activeCategory);
 
-    fetch(`/api/articles?limit=${MAX_ARTICLES}`)
+    fetch(`/api/articles-by-category?${params}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then(({ articles, categories }: { articles: CmsArticle[]; categories: string[] }) => {
+      .then(({ articles }: { articles: Article[] }) => {
         setArticles(articles);
-        setCategories(configuredCategories.length > 0 ? configuredCategories : categories);
+        if (!activeCategory) {
+          const unique = [...new Set(articles.flatMap((a) => (a.category ? [a.category] : [])))];
+          setCategories(unique);
+        }
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
-  }, []); // categoriesProp is a CMS-set prop, stable at mount
+  }, [activeCategory]);
 
   const handleCategoryChange = (cat: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -69,67 +63,78 @@ export default function CategoryBrowseClient({
     router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
   };
 
-  const filtered = activeCategory
-    ? articles.filter((a) => a.data.categories?.includes(activeCategory))
-    : articles;
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.ceil(articles.length / PAGE_SIZE);
+  const paged = articles.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className={`theme-${theme} flex flex-col gap-6 p-6`}>
       {title && <h2 dangerouslySetInnerHTML={{ __html: sanitizeHtml(title) }} />}
-      <SearchLoadingState isLoading={isLoading} />
-      {!isLoading && (
-        <>
-          <CategoryFilter
-            categories={categories}
-            activeCategory={activeCategory}
-            onCategoryChange={handleCategoryChange}
-          />
-          {paged.length === 0 ? (
-            <SearchEmptyState
-              query={activeCategory ?? ""}
-              onClearSearch={() => handleCategoryChange(null)}
+
+      {categories.length > 0 && (
+        <CategoryFilter
+          categories={categories}
+          activeCategory={activeCategory}
+          onCategoryChange={handleCategoryChange}
+        />
+      )}
+
+      {isLoading ? (
+        <div role="status" aria-label="Loading articles" className="flex flex-col gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2 border-b border-border pb-4 animate-pulse">
+              <div className="h-5 w-3/4 rounded bg-muted/30" />
+              <div className="h-3 w-1/4 rounded bg-muted/30" />
+              <div className="h-3 w-full rounded bg-muted/30" />
+              <div className="h-3 w-5/6 rounded bg-muted/30" />
+            </div>
+          ))}
+        </div>
+      ) : paged.length === 0 ? (
+        <SearchEmptyState
+          query={activeCategory ?? ""}
+          onClearSearch={() => handleCategoryChange(null)}
+        />
+      ) : (
+        <div className="flex flex-col gap-4">
+          {paged.map((article) => (
+            <ArticleHit
+              key={article.id}
+              title={article.title}
+              slug={article.slug}
+              publishDate={
+                article.publishedAt
+                  ? new Date(article.publishedAt).getTime()
+                  : undefined
+              }
+              description={article.excerpt}
+              categories={article.category ? [article.category] : undefined}
             />
-          ) : (
-            <div className="flex flex-col gap-4">
-              {paged.map((article) => (
-                <ArticleHit
-                  key={article.id}
-                  title={article.data.title ?? ""}
-                  slug={article.data.slug ?? ""}
-                  publishDate={article.data.publishDate}
-                  description={article.data.metadata?.description}
-                  categories={article.data.categories}
-                />
-              ))}
-            </div>
-          )}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4">
-              <button
-                type="button"
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-                className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
-              >
-                Previous
-              </button>
-              <span className="text-sm text-muted">
-                {page} of {totalPages}
-              </span>
-              <button
-                type="button"
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </>
+          ))}
+        </div>
+      )}
+
+      {!isLoading && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4">
+          <button
+            type="button"
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-muted">
+            {page} of {totalPages}
+          </span>
+          <button
+            type="button"
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+            className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   );
