@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
 
-const API_BASE = "https://vercel-daily-news-api.vercel.app";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+const API_BASE = process.env.API_BASE ?? "https://vercel-daily-news-api.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";
 
 interface ContentBlock {
