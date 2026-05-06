@@ -1,38 +1,33 @@
 import SearchResults from "@/components/ui/SearchResults";
+import type { Article } from "@/lib/articles-api";
 
-const sampleArticles = [
+const sampleArticles: Article[] = [
   {
     id: "1",
-    name: "Article 1",
-    published: "published",
-    data: {
-      slug: "intro-to-nextjs",
-      title: "Introduction to Next.js App Router",
-      publishDate: Date.now() - 86400000,
-      metadata: { media: "https://placehold.co/600x338.png" },
-    },
+    title: "Introduction to Next.js App Router",
+    slug: "intro-to-nextjs",
+    excerpt: "A deep dive into the Next.js App Router and how it changes the way we build React apps.",
+    image: "https://placehold.co/600x338.png",
+    publishedAt: new Date(Date.now() - 86400000).toISOString(),
+    category: "engineering",
   },
   {
     id: "2",
-    name: "Article 2",
-    published: "published",
-    data: {
-      slug: "tailwind-tips",
-      title: "Tailwind CSS Tips and Tricks for Modern UI",
-      publishDate: Date.now() - 2 * 86400000,
-      metadata: {},
-    },
+    title: "Tailwind CSS Tips and Tricks for Modern UI",
+    slug: "tailwind-tips",
+    excerpt: "Practical tips to get the most out of Tailwind CSS in your design system.",
+    image: "",
+    publishedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    category: "design",
   },
   {
     id: "3",
-    name: "Article 3",
-    published: "published",
-    data: {
-      slug: "builder-io-guide",
-      title: "Getting Started with Builder.io",
-      publishDate: Date.now() - 3 * 86400000,
-      metadata: { media: "https://placehold.co/600x338.png" },
-    },
+    title: "Getting Started with Builder.io",
+    slug: "builder-io-guide",
+    excerpt: "How to connect Builder.io to your Next.js application with the App Router SDK.",
+    image: "https://placehold.co/600x338.png",
+    publishedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+    category: "changelog",
   },
 ];
 

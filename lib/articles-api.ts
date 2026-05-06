@@ -78,3 +78,21 @@ export async function fetchArticlesByCategory(
     return [];
   }
 }
+
+export async function fetchArticlesBySearch(
+  query: string,
+  category?: string | null,
+  limit = 20
+): Promise<Article[]> {
+  try {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (query) params.set("search", query);
+    if (category) params.set("category", category);
+    const res = await newsFetch(`/api/articles?${params}`);
+    if (!res.ok) return [];
+    const json = (await res.json()) as { success: boolean; data: Article[] };
+    return json.success ? json.data : [];
+  } catch {
+    return [];
+  }
+}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { CmsArticle } from "@/lib/cms-models";
+import type { Article } from "@/lib/articles-api";
 import SearchInput from "@/components/ui/SearchInput";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 import SearchResults from "@/components/ui/SearchResults";
@@ -17,7 +17,7 @@ const DELAY_MS = 5000;
 interface SearchPageClientProps {
   initialQuery: string;
   initialCategory: string | null;
-  defaultArticles: CmsArticle[];
+  defaultArticles: Article[];
   categories: string[];
   simulateDelay?: boolean;
 }
@@ -33,7 +33,7 @@ export default function SearchPageClient({
   const [inputValue, setInputValue] = useState(initialQuery);
   const [activeQuery, setActiveQuery] = useState(initialQuery);
   const [activeCategory, setActiveCategory] = useState<string | null>(initialCategory);
-  const [results, setResults] = useState<CmsArticle[]>(
+  const [results, setResults] = useState<Article[]>(
     initialQuery ? [] : defaultArticles
   );
   const [isLoading, setIsLoading] = useState(!!initialQuery || simulateDelay);
@@ -63,7 +63,7 @@ export default function SearchPageClient({
         { signal: controller.signal }
       );
       if (!res.ok) throw new Error("search failed");
-      const data: CmsArticle[] = await res.json();
+      const { articles: data }: { articles: Article[] } = await res.json();
       if (!controller.signal.aborted) setResults(data);
     } catch (err: unknown) {
       if ((err as Error)?.name !== "AbortError") setResults([]);
@@ -84,7 +84,7 @@ export default function SearchPageClient({
           { signal: controller.signal }
         );
         if (!res.ok) throw new Error("search failed");
-        const data: CmsArticle[] = await res.json();
+        const { articles: data }: { articles: Article[] } = await res.json();
         if (!controller.signal.aborted) setResults(data);
       } catch (err: unknown) {
         if ((err as Error)?.name !== "AbortError") setResults([]);
@@ -136,7 +136,7 @@ export default function SearchPageClient({
     } else {
       setResults(
         category
-          ? defaultArticles.filter((a) => a.data.categories?.includes(category))
+          ? defaultArticles.filter((a) => a.category === category)
           : defaultArticles
       );
     }
@@ -151,7 +151,7 @@ export default function SearchPageClient({
     syncUrl("", activeCategory);
     setResults(
       activeCategory
-        ? defaultArticles.filter((a) => a.data.categories?.includes(activeCategory))
+        ? defaultArticles.filter((a) => a.category === activeCategory)
         : defaultArticles
     );
   };
@@ -182,7 +182,7 @@ export default function SearchPageClient({
         {!isLoading && results.length > 0 && (
           <>
             {isDefaultView && (
-              <h2 className="text-lg font-semibold mb-4 text-muted">Recent Articles</h2>
+              <h2 className="text-lg font-semibold mb-4 text-muted">Trending Articles</h2>
             )}
             <SearchResults articles={results} />
           </>
