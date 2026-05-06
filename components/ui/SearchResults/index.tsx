@@ -1,14 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
-import type { CmsArticle } from "@/lib/cms-models";
+import type { Article } from "@/lib/articles-api";
 
 interface SearchResultsProps {
-  articles: CmsArticle[];
+  articles: Article[];
 }
 
-function formatDate(publishDate?: number): string {
-  if (!publishDate) return "";
-  return new Date(publishDate).toLocaleDateString("en-US", {
+function formatDate(publishedAt?: string): string {
+  if (!publishedAt) return "";
+  return new Date(publishedAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -23,14 +23,14 @@ export default function SearchResults({ articles }: SearchResultsProps) {
       {articles.map((article) => (
         <li key={article.id} className="h-full">
           <Link
-            href={`/content/${article.data.slug ?? article.id}`}
+            href={`/content/${article.slug}`}
             className="group flex flex-col h-full rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <div className="relative aspect-video w-full overflow-hidden bg-muted/20">
-              {article.data.metadata?.media ? (
+              {article.image ? (
                 <Image
-                  src={article.data.metadata.media}
-                  alt={article.data.title ?? ""}
+                  src={article.image}
+                  alt={article.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -42,10 +42,10 @@ export default function SearchResults({ articles }: SearchResultsProps) {
             </div>
             <div className="flex flex-col flex-1 gap-2 p-4">
               <h3 className="text-base font-semibold leading-snug line-clamp-2 text-foreground">
-                {article.data.title ?? "Untitled"}
+                {article.title}
               </h3>
-              {article.data.publishDate && (
-                <p className="text-xs text-muted">{formatDate(article.data.publishDate)}</p>
+              {article.publishedAt && (
+                <p className="text-xs text-muted">{formatDate(article.publishedAt)}</p>
               )}
             </div>
           </Link>

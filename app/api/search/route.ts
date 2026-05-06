@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { searchArticles } from "@/lib/builder";
+import { fetchArticlesBySearch } from "@/lib/articles-api";
 import { withRateLimit } from "@/lib/api-utils";
 
 const querySchema = z.object({
@@ -19,10 +19,10 @@ export async function GET(request: NextRequest) {
 
   try {
     const { q, category } = parsed.data;
-    const articles = await searchArticles(q.trim(), category ?? null);
-    return NextResponse.json(articles);
+    const articles = await fetchArticlesBySearch(q.trim(), category ?? null);
+    return NextResponse.json({ articles });
   } catch (err) {
     console.error(`[${reqId}] /api/search unexpected error`, err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ articles: [] }, { status: 500 });
   }
 }
