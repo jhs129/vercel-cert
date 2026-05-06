@@ -1,30 +1,6 @@
 import CardImage from "@/components/ui/CardImage";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
-
-const API_BASE = process.env.API_BASE ?? "https://vercel-daily-news-api.vercel.app";
-
-interface TrendingArticle {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  image: string;
-}
-
-async function fetchTrendingArticles(): Promise<TrendingArticle[]> {
-  const token = process.env.API_BYPASS_TOKEN;
-  try {
-    const res = await fetch(`${API_BASE}/api/articles/trending`, {
-      headers: token ? { "x-vercel-protection-bypass": token } : {},
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return [];
-    const json = (await res.json()) as { success: boolean; data: TrendingArticle[] };
-    return json.success ? json.data : [];
-  } catch {
-    return [];
-  }
-}
+import { fetchTrendingArticles } from "@/lib/articles-api";
 
 export default async function TrendingHomePage() {
   const articles = await fetchTrendingArticles();
