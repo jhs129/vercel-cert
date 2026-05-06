@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import type { Article, Category } from "@/lib/articles-api";
+import type { Article } from "@/lib/articles-api";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 import { ArticleHit } from "@/components/ui/ArticleHit";
 import SearchEmptyState from "@/components/ui/SearchEmptyState";
@@ -35,15 +35,6 @@ export default function CategoryBrowseClient({
   }, [activeCategory]);
 
   useEffect(() => {
-    fetch("/api/categories")
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then(({ categories }: { categories: Category[] }) => {
-        setCategories(categories.map((c) => c.slug));
-      })
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
     setIsLoading(true);
     const params = new URLSearchParams({ limit: "100" });
     if (activeCategory) params.set("category", activeCategory);
@@ -52,6 +43,10 @@ export default function CategoryBrowseClient({
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then(({ articles }: { articles: Article[] }) => {
         setArticles(articles);
+        if (!activeCategory) {
+          const unique = [...new Set(articles.flatMap((a) => (a.category ? [a.category] : [])))];
+          setCategories(unique);
+        }
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
