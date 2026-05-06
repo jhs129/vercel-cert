@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { fetchTrendingArticles } from "@/lib/articles-api";
+import { fetchTrendingArticles, fetchCategories } from "@/lib/articles-api";
 import SearchPageClient from "./SearchPageClient";
 
 export const metadata: Metadata = {
@@ -17,8 +17,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const initialCategory = params.category ?? null;
   const simulateDelay = params.delay === "true";
 
-  const defaultArticles = await fetchTrendingArticles();
-  const categories = [...new Set(defaultArticles.flatMap((a) => (a.category ? [a.category] : [])))];
+  const [defaultArticles, categoryList] = await Promise.all([
+    fetchTrendingArticles(),
+    fetchCategories(),
+  ]);
+  const categories = categoryList.map((c) => c.slug);
 
   return (
     <SearchPageClient

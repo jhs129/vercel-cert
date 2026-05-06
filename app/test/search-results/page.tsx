@@ -16,7 +16,7 @@ const sampleArticles: Article[] = [
     title: "Tailwind CSS Tips and Tricks for Modern UI",
     slug: "tailwind-tips",
     excerpt: "Practical tips to get the most out of Tailwind CSS in your design system.",
-    image: "",
+    image: "https://placehold.co/600x338.png",
     publishedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
     category: "design",
   },
