@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import type { Metadata } from "next";
 import { BuilderPageClient } from "./BuilderPageClient";
+import TrendingHomePage from "./TrendingHomePage";
 import { BUILDER_API_KEY, getPageContent, buildUrlPath } from "@/lib/builder";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -39,6 +40,10 @@ export async function generateMetadata({
   const { page } = await params;
   const resolvedSearchParams = await searchParams;
   const urlPath = buildUrlPath(page);
+
+  if (urlPath === "/") {
+    return { title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION };
+  }
 
   const content = await getPageContent(urlPath, resolvedSearchParams);
 
@@ -102,6 +107,10 @@ export default async function BuilderPage({
   const { page } = await params;
   const resolvedSearchParams = await searchParams;
   const urlPath = buildUrlPath(page);
+
+  if (urlPath === "/") {
+    return <TrendingHomePage />;
+  }
 
   const previewing = isPreviewing(resolvedSearchParams);
   const content = await getPageContent(urlPath, resolvedSearchParams);
