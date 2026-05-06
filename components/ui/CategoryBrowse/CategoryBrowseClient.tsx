@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import type { Article } from "@/lib/articles-api";
+import type { Article, Category } from "@/lib/articles-api";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 import { ArticleHit } from "@/components/ui/ArticleHit";
 import SearchEmptyState from "@/components/ui/SearchEmptyState";
@@ -14,13 +14,11 @@ const PAGE_SIZE = 10;
 
 interface CategoryBrowseClientProps extends Themeable {
   title?: string;
-  categories: string[];
 }
 
 export default function CategoryBrowseClient({
   title = "Browse Articles",
   theme = "light",
-  categories,
 }: CategoryBrowseClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -29,12 +27,22 @@ export default function CategoryBrowseClient({
   const activeCategory = searchParams.get("category");
 
   const [articles, setArticles] = useState<Article[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
     setPage(1);
   }, [activeCategory]);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+      .then(({ categories }: { categories: Category[] }) => {
+        setCategories(categories.map((c) => c.slug));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
