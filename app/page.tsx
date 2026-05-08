@@ -19,11 +19,15 @@ export default async function HomePage() {
     <>
       {hero && (
         <HeroBanner
-          backgroundImage={hero.image}
-          headline={hero.title}
-          body={hero.excerpt}
-          ctaLabel="Read More"
-          ctaHref={`/content/${hero.slug}`}
+          slides={[
+            {
+              backgroundImage: hero.image,
+              headline: hero.title,
+              body: hero.excerpt,
+              ctaLabel: "Read More",
+              ctaHref: `/content/${hero.slug}`,
+            },
+          ]}
         />
       )}
       {cards.length > 0 && (
