@@ -1,7 +1,7 @@
 import type { Themeable } from "@/lib/types";
 import HeroBannerClient from "./HeroBannerClient";
 
-export interface HeroBannerSlide {
+export interface Slide {
   backgroundImage?: string;
   headline: string;
   body: string;
@@ -11,7 +11,7 @@ export interface HeroBannerSlide {
 }
 
 export interface HeroBannerProps extends Themeable {
-  slides: HeroBannerSlide[];
+  slides: Slide[];
   autoPlayInterval?: number;
 }
 

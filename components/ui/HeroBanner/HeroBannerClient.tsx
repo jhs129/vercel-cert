@@ -1,10 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { HeroBannerProps } from "./index";
 import HeroBannerSlideComponent from "./HeroBannerSlide";
+
+function subscribeToReducedMotion(callback: () => void) {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
 
 export default function HeroBannerClient({
   slides,
@@ -13,17 +19,13 @@ export default function HeroBannerClient({
 }: HeroBannerProps) {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false
+  );
   const touchStartX = useRef<number | null>(null);
   const count = slides.length;
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
 
   const prev = useCallback(
     () => setCurrent((c) => (c - 1 + count) % count),
@@ -53,7 +55,10 @@ export default function HeroBannerClient({
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const delta = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 40) delta > 0 ? next() : prev();
+    if (Math.abs(delta) > 40) {
+      if (delta > 0) next();
+      else prev();
+    }
     touchStartX.current = null;
   };
 
