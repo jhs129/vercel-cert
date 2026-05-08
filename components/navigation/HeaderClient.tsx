@@ -33,7 +33,7 @@ export function HeaderClient({ links, subscriptionSlot }: HeaderClientProps) {
             </Link>
           ))}
         </nav>
-        <div className="hidden md:flex">
+        <div className="hidden md:flex items-center">
           {subscriptionSlot}
         </div>
         <button
