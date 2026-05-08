@@ -151,3 +151,4 @@ vite.config.ts.timestamp-*
 storybook-static
 .vercel
 .env*.local
+.superpowers/**
