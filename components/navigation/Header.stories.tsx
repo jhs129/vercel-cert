@@ -9,6 +9,9 @@ const meta: Meta<typeof HeaderClient> = {
     layout: "fullscreen",
   },
   tags: ["autodocs"],
+  argTypes: {
+    subscriptionSlot: { control: false },
+  },
 };
 
 export default meta;
@@ -62,5 +65,24 @@ export const CustomLinks: Story = {
       { href: "/contact", label: "Contact" },
     ],
     subscriptionSlot: <SubscribeButton />,
+  },
+};
+
+export const MobileMenuOpen: Story = {
+  args: {
+    links: defaultLinks,
+    subscriptionSlot: <SubscribeButton />,
+  },
+  parameters: {
+    viewport: {
+      defaultViewport: "mobile1",
+    },
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    // @ts-expect-error @storybook/test is available at runtime in Storybook
+    const { within, userEvent } = await import("@storybook/test");
+    const canvas = within(canvasElement);
+    const hamburger = canvas.getByRole("button", { name: /open navigation menu/i });
+    await userEvent.click(hamburger);
   },
 };
