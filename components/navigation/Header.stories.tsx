@@ -1,4 +1,3 @@
-// components/navigation/Header.stories.tsx
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { HeaderClient } from "./HeaderClient";
 
@@ -26,7 +25,7 @@ const defaultLinks = [
 
 function SubscribeButton() {
   return (
-    <button className="bg-accent text-white text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
+    <button className="bg-accent text-background text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
       Subscribe
     </button>
   );

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { NavLink } from "@/lib/types";
 
 interface HeaderClientProps {
   links: NavLink[];
-  subscriptionSlot: React.ReactNode;
+  subscriptionSlot: ReactNode;
 }
 
 export function HeaderClient({ links, subscriptionSlot }: HeaderClientProps) {
@@ -26,7 +27,7 @@ export function HeaderClient({ links, subscriptionSlot }: HeaderClientProps) {
             priority
           />
         </Link>
-        <nav className="hidden md:flex flex-1 flex-row items-center gap-8">
+        <nav aria-label="Primary" className="hidden md:flex flex-1 flex-row items-center gap-8">
           {links.map((link) => (
             <Link key={link.href} href={link.href} className="leading-none">
               {link.label}
@@ -37,6 +38,7 @@ export function HeaderClient({ links, subscriptionSlot }: HeaderClientProps) {
           {subscriptionSlot}
         </div>
         <button
+          type="button"
           className="ml-auto flex md:hidden flex-col gap-1.5 p-1"
           aria-expanded={isMenuOpen}
           aria-controls="mobile-nav"
@@ -57,6 +59,7 @@ export function HeaderClient({ links, subscriptionSlot }: HeaderClientProps) {
       {isMenuOpen && (
         <nav
           id="mobile-nav"
+          aria-label="Mobile"
           className="flex flex-col md:hidden border-t border-border bg-background"
         >
           {links.map((link) => (
