@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
 import { fetchArticleBySlug, type Article } from "@/lib/articles-api";
+import { isSubscribedServer } from "@/lib/subscription.server";
+import { PaywallBanner } from "@/components/ui/PaywallBanner";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";
@@ -71,7 +73,10 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = await fetchArticle(slug);
+  const [article, isSubscribed] = await Promise.all([
+    fetchArticle(slug),
+    isSubscribedServer(),
+  ]);
   if (!article) notFound();
 
   const { author = { name: "", avatar: "" }, publishedAt = "", tags = [], content = [] } = article;
@@ -94,16 +99,20 @@ export default async function ArticlePage({
 
   const heroBlur = article.image ? await generateBlurPlaceholder(article.image) : undefined;
 
+  const teaser =
+    content.find((b) => b.type === "paragraph" && b.text)?.text ??
+    article.excerpt;
+
   return (
     <article className="py-8">
       {article.image && (
-        <div className="relative w-full aspect-video mb-8 overflow-hidden rounded-lg">
+        <div className="relative w-full h-48 md:h-64 lg:h-72 mb-8 overflow-hidden rounded-lg">
           <Image
             src={article.image}
             alt={article.title}
             fill
             sizes="(max-width: 1024px) 100vw, 984px"
-            className="object-cover"
+            className="object-cover object-center"
             quality={80}
             priority
             placeholder={heroBlur ? "blur" : "empty"}
@@ -153,27 +162,31 @@ export default async function ArticlePage({
         )}
       </header>
 
-      <div className="prose max-w-none space-y-4">
-        {content.map((block, i) => {
-          if (block.type === "paragraph" && block.text) {
-            return (
-              <p key={i} className="text-foreground leading-relaxed">
-                {parseInline(block.text)}
-              </p>
-            );
-          }
-          if (block.type === "unordered-list" && block.items) {
-            return (
-              <ul key={i} className="list-disc list-inside space-y-2 text-foreground">
-                {block.items.map((item, j) => (
-                  <li key={j}>{parseInline(item)}</li>
-                ))}
-              </ul>
-            );
-          }
-          return null;
-        })}
-      </div>
+      {isSubscribed ? (
+        <div className="prose max-w-none space-y-4">
+          {content.map((block, i) => {
+            if (block.type === "paragraph" && block.text) {
+              return (
+                <p key={i} className="text-foreground leading-relaxed">
+                  {parseInline(block.text)}
+                </p>
+              );
+            }
+            if (block.type === "unordered-list" && block.items) {
+              return (
+                <ul key={i} className="list-disc list-inside space-y-2 text-foreground">
+                  {block.items.map((item, j) => (
+                    <li key={j}>{parseInline(item)}</li>
+                  ))}
+                </ul>
+              );
+            }
+            return null;
+          })}
+        </div>
+      ) : (
+        <PaywallBanner teaser={teaser ?? ""} />
+      )}
     </article>
   );
 }
