@@ -2,7 +2,7 @@ import CardImage from "@/components/ui/CardImage";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
 import { fetchTrendingArticles } from "@/lib/articles-api";
 
-export default async function TrendingHomePage() {
+export default async function HomePage() {
   const articles = await fetchTrendingArticles();
 
   const articlesWithBlur = await Promise.all(
