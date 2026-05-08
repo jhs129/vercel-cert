@@ -29,27 +29,40 @@ export default function CategoryBrowseClient({
   const [categories, setCategories] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [prevCategory, setPrevCategory] = useState(activeCategory);
 
-  useEffect(() => {
+  // React-recommended pattern: derive state changes during render via state comparison
+  if (prevCategory !== activeCategory) {
+    setPrevCategory(activeCategory);
     setPage(1);
-  }, [activeCategory]);
+    setIsLoading(true);
+  }
+
+  const effectivePage = prevCategory !== activeCategory ? 1 : page;
 
   useEffect(() => {
-    setIsLoading(true);
+    let cancelled = false;
     const params = new URLSearchParams({ limit: "100" });
     if (activeCategory) params.set("category", activeCategory);
 
     fetch(`/api/articles-by-category?${params}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then(({ articles }: { articles: Article[] }) => {
-        setArticles(articles);
+      .then(({ articles: fetched }: { articles: Article[] }) => {
+        if (cancelled) return;
+        setArticles(fetched);
         if (!activeCategory) {
-          const unique = [...new Set(articles.flatMap((a) => (a.category ? [a.category] : [])))];
+          const unique = [...new Set(fetched.flatMap((a) => (a.category ? [a.category] : [])))];
           setCategories(unique);
         }
         setIsLoading(false);
       })
-      .catch(() => setIsLoading(false));
+      .catch(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeCategory]);
 
   const handleCategoryChange = (cat: string | null) => {
@@ -64,7 +77,7 @@ export default function CategoryBrowseClient({
   };
 
   const totalPages = Math.ceil(articles.length / PAGE_SIZE);
-  const paged = articles.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paged = articles.slice((effectivePage - 1) * PAGE_SIZE, effectivePage * PAGE_SIZE);
 
   return (
     <div className={`theme-${theme} flex flex-col gap-6 p-6`}>
@@ -117,18 +130,18 @@ export default function CategoryBrowseClient({
         <div className="flex items-center justify-center gap-4">
           <button
             type="button"
-            disabled={page === 1}
+            disabled={effectivePage === 1}
             onClick={() => setPage((p) => p - 1)}
             className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
           >
             Previous
           </button>
           <span className="text-sm text-muted">
-            {page} of {totalPages}
+            {effectivePage} of {totalPages}
           </span>
           <button
             type="button"
-            disabled={page === totalPages}
+            disabled={effectivePage === totalPages}
             onClick={() => setPage((p) => p + 1)}
             className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
           >

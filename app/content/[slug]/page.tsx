@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
-import { fetchArticleBySlug, type Article, type ContentBlock } from "@/lib/articles-api";
+import { fetchArticleBySlug, type Article } from "@/lib/articles-api";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";
@@ -97,13 +97,13 @@ export default async function ArticlePage({
   return (
     <article className="py-8">
       {article.image && (
-        <div className="relative w-full aspect-video mb-8 overflow-hidden rounded-lg">
+        <div className="relative w-full h-48 md:h-64 lg:h-72 mb-8 overflow-hidden rounded-lg">
           <Image
             src={article.image}
             alt={article.title}
             fill
             sizes="(max-width: 1024px) 100vw, 984px"
-            className="object-cover"
+            className="object-cover object-center"
             quality={80}
             priority
             placeholder={heroBlur ? "blur" : "empty"}
