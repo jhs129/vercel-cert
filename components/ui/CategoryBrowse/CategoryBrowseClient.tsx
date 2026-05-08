@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { Article } from "@/lib/articles-api";
 import CategoryFilter from "@/components/ui/CategoryFilter";
@@ -15,6 +15,46 @@ interface CategoryBrowseClientProps extends Themeable {
   title?: string;
 }
 
+interface BrowseState {
+  articles: Article[];
+  categories: string[];
+  isLoading: boolean;
+  page: number;
+}
+
+type BrowseAction =
+  | { type: "FETCH_START" }
+  | { type: "FETCH_SUCCESS"; articles: Article[]; categories: string[] }
+  | { type: "FETCH_ERROR" }
+  | { type: "SET_PAGE"; page: number };
+
+function browseReducer(state: BrowseState, action: BrowseAction): BrowseState {
+  switch (action.type) {
+    case "FETCH_START":
+      return { ...state, isLoading: true, page: 1 };
+    case "FETCH_SUCCESS":
+      return {
+        ...state,
+        isLoading: false,
+        articles: action.articles,
+        categories: action.categories.length > 0 ? action.categories : state.categories,
+      };
+    case "FETCH_ERROR":
+      return { ...state, isLoading: false };
+    case "SET_PAGE":
+      return { ...state, page: action.page };
+    default:
+      return state;
+  }
+}
+
+const initialState: BrowseState = {
+  articles: [],
+  categories: [],
+  isLoading: true,
+  page: 1,
+};
+
 export default function CategoryBrowseClient({
   title = "Browse Articles",
   theme = "light",
@@ -25,23 +65,12 @@ export default function CategoryBrowseClient({
 
   const activeCategory = searchParams.get("category");
 
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [prevCategory, setPrevCategory] = useState(activeCategory);
-
-  // React-recommended pattern: derive state changes during render via state comparison
-  if (prevCategory !== activeCategory) {
-    setPrevCategory(activeCategory);
-    setPage(1);
-    setIsLoading(true);
-  }
-
-  const effectivePage = prevCategory !== activeCategory ? 1 : page;
+  const [state, dispatch] = useReducer(browseReducer, initialState);
+  const { articles, categories, isLoading, page } = state;
 
   useEffect(() => {
     let cancelled = false;
+    dispatch({ type: "FETCH_START" });
     const params = new URLSearchParams({ limit: "100" });
     if (activeCategory) params.set("category", activeCategory);
 
@@ -49,15 +78,13 @@ export default function CategoryBrowseClient({
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then(({ articles: fetched }: { articles: Article[] }) => {
         if (cancelled) return;
-        setArticles(fetched);
-        if (!activeCategory) {
-          const unique = [...new Set(fetched.flatMap((a) => (a.category ? [a.category] : [])))];
-          setCategories(unique);
-        }
-        setIsLoading(false);
+        const unique = !activeCategory
+          ? [...new Set(fetched.flatMap((a) => (a.category ? [a.category] : [])))]
+          : [];
+        dispatch({ type: "FETCH_SUCCESS", articles: fetched, categories: unique });
       })
       .catch(() => {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) dispatch({ type: "FETCH_ERROR" });
       });
 
     return () => {
@@ -77,7 +104,7 @@ export default function CategoryBrowseClient({
   };
 
   const totalPages = Math.ceil(articles.length / PAGE_SIZE);
-  const paged = articles.slice((effectivePage - 1) * PAGE_SIZE, effectivePage * PAGE_SIZE);
+  const paged = articles.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className={`theme-${theme} flex flex-col gap-6 p-6`}>
@@ -130,19 +157,19 @@ export default function CategoryBrowseClient({
         <div className="flex items-center justify-center gap-4">
           <button
             type="button"
-            disabled={effectivePage === 1}
-            onClick={() => setPage((p) => p - 1)}
+            disabled={page === 1}
+            onClick={() => dispatch({ type: "SET_PAGE", page: page - 1 })}
             className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
           >
             Previous
           </button>
           <span className="text-sm text-muted">
-            {effectivePage} of {totalPages}
+            {page} of {totalPages}
           </span>
           <button
             type="button"
-            disabled={effectivePage === totalPages}
-            onClick={() => setPage((p) => p + 1)}
+            disabled={page === totalPages}
+            onClick={() => dispatch({ type: "SET_PAGE", page: page + 1 })}
             className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
           >
             Next

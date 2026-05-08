@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import type { Themeable, Stylable } from "@/lib/types";
@@ -59,9 +60,9 @@ export default function Button({
 
   if (href) {
     return (
-      <a href={href} className={className}>
+      <Link href={href} className={className}>
         {label}
-      </a>
+      </Link>
     );
   }
 
