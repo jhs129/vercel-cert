@@ -26,11 +26,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Vercel News Site",
-  description: "A sample news site built with Next.js and Builder.io",
+  description: "A sample news site built with Next.js",
   metadataBase: new URL("https://vercel-cert.jhsdigitalconsulting.com"),
   openGraph: {
     title: "Vercel News Site",
-    description: "A sample news site built with Next.js and Builder.io",
+    description: "A sample news site built with Next.js",
     url: "https://vercel-cert.jhsdigitalconsulting.com",
     siteName: "Vercel News Site",
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Vercel News Site",
-    description: "A sample news site built with Next.js and Builder.io",
+    description: "A sample news site built with Next.js",
     images: ["https://vercel-cert.jhsdigitalconsulting.com/og-image.png"],
   },
 };
