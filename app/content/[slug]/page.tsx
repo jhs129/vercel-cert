@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
-import { fetchArticleBySlug, type Article, type ContentBlock } from "@/lib/articles-api";
+import { fetchArticleBySlug, type Article } from "@/lib/articles-api";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";

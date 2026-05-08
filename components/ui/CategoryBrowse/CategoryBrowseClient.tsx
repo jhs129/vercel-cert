@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { Article } from "@/lib/articles-api";
 import CategoryFilter from "@/components/ui/CategoryFilter";
@@ -15,6 +15,46 @@ interface CategoryBrowseClientProps extends Themeable {
   title?: string;
 }
 
+interface BrowseState {
+  articles: Article[];
+  categories: string[];
+  isLoading: boolean;
+  page: number;
+}
+
+type BrowseAction =
+  | { type: "FETCH_START" }
+  | { type: "FETCH_SUCCESS"; articles: Article[]; categories: string[] }
+  | { type: "FETCH_ERROR" }
+  | { type: "SET_PAGE"; page: number };
+
+function browseReducer(state: BrowseState, action: BrowseAction): BrowseState {
+  switch (action.type) {
+    case "FETCH_START":
+      return { ...state, isLoading: true, page: 1 };
+    case "FETCH_SUCCESS":
+      return {
+        ...state,
+        isLoading: false,
+        articles: action.articles,
+        categories: action.categories.length > 0 ? action.categories : state.categories,
+      };
+    case "FETCH_ERROR":
+      return { ...state, isLoading: false };
+    case "SET_PAGE":
+      return { ...state, page: action.page };
+    default:
+      return state;
+  }
+}
+
+const initialState: BrowseState = {
+  articles: [],
+  categories: [],
+  isLoading: true,
+  page: 1,
+};
+
 export default function CategoryBrowseClient({
   title = "Browse Articles",
   theme = "light",
@@ -25,31 +65,31 @@ export default function CategoryBrowseClient({
 
   const activeCategory = searchParams.get("category");
 
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [state, dispatch] = useReducer(browseReducer, initialState);
+  const { articles, categories, isLoading, page } = state;
 
   useEffect(() => {
-    setPage(1);
-  }, [activeCategory]);
-
-  useEffect(() => {
-    setIsLoading(true);
+    let cancelled = false;
+    dispatch({ type: "FETCH_START" });
     const params = new URLSearchParams({ limit: "100" });
     if (activeCategory) params.set("category", activeCategory);
 
     fetch(`/api/articles-by-category?${params}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then(({ articles }: { articles: Article[] }) => {
-        setArticles(articles);
-        if (!activeCategory) {
-          const unique = [...new Set(articles.flatMap((a) => (a.category ? [a.category] : [])))];
-          setCategories(unique);
-        }
-        setIsLoading(false);
+      .then(({ articles: fetched }: { articles: Article[] }) => {
+        if (cancelled) return;
+        const unique = !activeCategory
+          ? [...new Set(fetched.flatMap((a) => (a.category ? [a.category] : [])))]
+          : [];
+        dispatch({ type: "FETCH_SUCCESS", articles: fetched, categories: unique });
       })
-      .catch(() => setIsLoading(false));
+      .catch(() => {
+        if (!cancelled) dispatch({ type: "FETCH_ERROR" });
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeCategory]);
 
   const handleCategoryChange = (cat: string | null) => {
@@ -118,7 +158,7 @@ export default function CategoryBrowseClient({
           <button
             type="button"
             disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
+            onClick={() => dispatch({ type: "SET_PAGE", page: page - 1 })}
             className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
           >
             Previous
@@ -129,7 +169,7 @@ export default function CategoryBrowseClient({
           <button
             type="button"
             disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
+            onClick={() => dispatch({ type: "SET_PAGE", page: page + 1 })}
             className="rounded border border-border px-3 py-1 text-sm font-medium transition-colors disabled:opacity-40 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
           >
             Next
