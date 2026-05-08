@@ -1,6 +1,6 @@
 {
   "name": "vercel-cert",
-  "version": "0.1.54",
+  "version": "0.1.53",
   "private": true,
   "scripts": {
     "dev": "next dev",

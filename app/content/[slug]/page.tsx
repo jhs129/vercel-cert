@@ -106,13 +106,13 @@ export default async function ArticlePage({
   return (
     <article className="py-8">
       {article.image && (
-        <div className="relative w-full aspect-video mb-8 overflow-hidden rounded-lg">
+        <div className="relative w-full h-48 md:h-64 lg:h-72 mb-8 overflow-hidden rounded-lg">
           <Image
             src={article.image}
             alt={article.title}
             fill
             sizes="(max-width: 1024px) 100vw, 984px"
-            className="object-cover"
+            className="object-cover object-center"
             quality={80}
             priority
             placeholder={heroBlur ? "blur" : "empty"}
