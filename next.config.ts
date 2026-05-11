@@ -1,7 +1,6 @@
-import BuilderDevTools from "@builder.io/dev-tools/next";
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = BuilderDevTools()({
+const nextConfig: NextConfig = {
   turbopack: {},
   images: {
     deviceSizes: [640, 768, 1024, 1280, 1536],
@@ -12,6 +11,6 @@ const nextConfig: NextConfig = BuilderDevTools()({
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },
-});
+};
 
 export default nextConfig;
