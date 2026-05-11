@@ -1,7 +1,7 @@
 import "server-only";
 import { getPlaiceholder } from "plaiceholder";
 
-const ALLOWED_BLUR_HOSTNAMES = new Set(["cdn.builder.io", "placehold.co"]);
+const ALLOWED_BLUR_HOSTNAMES = new Set(["placehold.co"]);
 const ALLOWED_BLUR_HOSTNAME_SUFFIXES = [".public.blob.vercel-storage.com"];
 
 export function generateColorPlaceholder(r: number, g: number, b: number): string {
