@@ -4,54 +4,47 @@ import { useState, useEffect } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { DismissButton } from "@/components/ui/Alert/DismissButton";
 import type { AlertVariant } from "@/components/ui/Alert";
-import type { CmsAlert } from "@/lib/cms-models";
+import type { BreakingNewsItem } from ".";
 
 interface AlertBannerClientProps {
-  alerts: CmsAlert[];
+  item: BreakingNewsItem;
 }
 
 const COOKIE_PREFIX = "alert-dismissed-";
 
-function getDismissedIds(): Set<string> {
-  if (typeof document === "undefined") return new Set();
-  return new Set(
-    document.cookie
-      .split("; ")
-      .filter((c) => c.startsWith(COOKIE_PREFIX))
-      .map((c) => c.slice(COOKIE_PREFIX.length).split("=")[0])
-  );
+function isDismissed(id: string): boolean {
+  if (typeof document === "undefined") return false;
+  return document.cookie.split("; ").some((c) => c.startsWith(`${COOKIE_PREFIX}${id}=`));
 }
 
 function setDismissCookie(id: string) {
   document.cookie = `${COOKIE_PREFIX}${id}=1; path=/`;
 }
 
-export function AlertBannerClient({ alerts }: AlertBannerClientProps) {
-  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+export function AlertBannerClient({ item }: AlertBannerClientProps) {
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDismissed(getDismissedIds());
-  }, []);
+    setDismissed(isDismissed(item.id));
+  }, [item.id]);
 
-  function dismiss(id: string) {
-    setDismissCookie(id);
-    setDismissed((prev) => new Set([...prev, id]));
+  if (dismissed) return null;
+
+  function dismiss() {
+    setDismissCookie(item.id);
+    setDismissed(true);
   }
 
-  const visible = alerts.filter((a) => !dismissed.has(a.id));
+  const variant: AlertVariant = item.urgent ? "breaking" : "info";
+  const label = item.category.replace(/-/g, " ");
 
   return (
-    <>
-      {visible.map((alert) => (
-        <Alert
-          key={alert.id}
-          variant={(alert.data.variant as AlertVariant) ?? "info"}
-          label={alert.data.label}
-          message={alert.data.message}
-          action={<DismissButton onClick={() => dismiss(alert.id)} />}
-        />
-      ))}
-    </>
+    <Alert
+      variant={variant}
+      label={label}
+      message={item.headline}
+      href={`/content/${item.articleId}`}
+      action={<DismissButton onClick={dismiss} />}
+    />
   );
 }

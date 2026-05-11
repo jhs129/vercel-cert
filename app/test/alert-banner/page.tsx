@@ -6,64 +6,32 @@ export default function AlertBannerTestPage() {
       <h1 className="text-2xl font-bold">AlertBanner — Test Page</h1>
 
       <section className="space-y-2">
-        <h2 className="text-lg font-semibold">Breaking variant</h2>
+        <h2 className="text-lg font-semibold">Urgent (breaking) variant</h2>
         <AlertBannerClient
-          alerts={[
-            {
-              id: "1",
-              name: "Breaking Alert",
-              published: "published",
-              data: { variant: "breaking", label: "Breaking", message: "This is a breaking alert." },
-            },
-          ]}
+          item={{
+            id: "test-1",
+            headline: "This is a breaking news headline.",
+            summary: "Summary of the breaking news.",
+            articleId: "article-1",
+            category: "company-news",
+            publishedAt: "2025-07-10T09:00:00Z",
+            urgent: true,
+          }}
         />
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-lg font-semibold">Warning variant</h2>
+        <h2 className="text-lg font-semibold">Non-urgent (info) variant</h2>
         <AlertBannerClient
-          alerts={[
-            {
-              id: "2",
-              name: "Warning Alert",
-              published: "published",
-              data: { variant: "warning", label: "Warning", message: "Something needs your attention." },
-            },
-          ]}
-        />
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold">Info variant</h2>
-        <AlertBannerClient
-          alerts={[
-            {
-              id: "3",
-              name: "Info Alert",
-              published: "published",
-              data: { variant: "info", label: "Info", message: "This is an informational alert." },
-            },
-          ]}
-        />
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold">Multiple alerts</h2>
-        <AlertBannerClient
-          alerts={[
-            {
-              id: "4",
-              name: "First Alert",
-              published: "published",
-              data: { variant: "breaking", label: "Breaking", message: "First alert in a stack." },
-            },
-            {
-              id: "5",
-              name: "Second Alert",
-              published: "published",
-              data: { variant: "info", label: "Info", message: "Second alert in a stack." },
-            },
-          ]}
+          item={{
+            id: "test-2",
+            headline: "Something informational to share with you.",
+            summary: "More detail about this item.",
+            articleId: "article-2",
+            category: "product-updates",
+            publishedAt: "2025-07-10T09:00:00Z",
+            urgent: false,
+          }}
         />
       </section>
     </main>
