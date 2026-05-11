@@ -23,7 +23,8 @@ export default function HeroBannerSlide({
   active,
   priority = false,
 }: HeroBannerSlideProps) {
-  const hasImageWithOverlay = !!backgroundImage && overlayEnabled;
+  const hasImage = !!backgroundImage;
+  const hasImageWithOverlay = hasImage && overlayEnabled;
 
   return (
     <div
@@ -52,10 +53,11 @@ export default function HeroBannerSlide({
       <div
         className={cn(
           "relative z-10 mx-auto max-w-4xl px-6 py-16 text-center",
-          hasImageWithOverlay && "text-white"
+          hasImage && "text-white",
+          hasImage && !overlayEnabled && "rounded-xl bg-black/40 backdrop-blur-sm"
         )}
       >
-        <h1 className="text-4xl font-bold leading-tight tracking-tight mb-6 md:text-6xl">
+        <h1 className="text-inherit text-4xl font-bold leading-tight tracking-tight mb-6 md:text-6xl">
           {headline}
         </h1>
         <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto md:text-xl">
