@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Home",
     description: "The latest news and trending articles.",
+    siteName: "Vercel News Site",
+    url: "/",
+    images: [{ url: "/og-image.png" }],
   },
 };
 

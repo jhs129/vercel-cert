@@ -7,7 +7,7 @@ import { generateBlurPlaceholder } from "@/lib/image-utils";
 import { fetchArticleBySlug, fetchTrendingArticles, type Article } from "@/lib/articles-api";
 import { isSubscribedServer } from "@/lib/subscription.server";
 import { PaywallBanner } from "@/components/ui/PaywallBanner";
-import CardImage from "@/components/ui/CardImage";
+import { TrendingArticles } from "@/components/ui/TrendingArticles";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";
@@ -39,33 +39,6 @@ function parseInline(text: string): ReactNode[] {
   });
 }
 
-async function TrendingArticles({ articles }: { articles: Article[] }) {
-  const articlesWithBlur = await Promise.all(
-    articles.map(async (a) => ({
-      ...a,
-      blurDataURL: a.image ? await generateBlurPlaceholder(a.image) : undefined,
-    }))
-  );
-
-  return (
-    <section className="mt-20 pt-12 border-t border-border">
-      <h2 className="text-2xl font-bold mb-6 mt-10">Trending Articles</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {articlesWithBlur.map((a) => (
-          <CardImage
-            key={a.id}
-            src={a.image}
-            alt={a.title}
-            headline={a.title}
-            slug={a.slug}
-            body={a.excerpt}
-            blurDataURL={a.blurDataURL}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
 
 export async function generateMetadata({
   params,
