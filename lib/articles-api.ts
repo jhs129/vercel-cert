@@ -20,17 +20,17 @@ export interface Article {
   tags?: string[];
 }
 
-async function newsFetch(path: string): Promise<Response> {
+async function newsFetch(path: string, revalidate = 300): Promise<Response> {
   const token = process.env.API_BYPASS_TOKEN;
   return fetch(`${API_BASE}${path}`, {
     headers: token ? { "x-vercel-protection-bypass": token } : {},
-    next: { revalidate: 60 },
+    next: { revalidate },
   });
 }
 
 export async function fetchTrendingArticles(): Promise<Article[]> {
   try {
-    const res = await newsFetch("/api/articles/trending");
+    const res = await newsFetch("/api/articles/trending", 300);
     if (!res.ok) return [];
     const json = (await res.json()) as { success: boolean; data: Article[] };
     return json.success ? json.data : [];
@@ -40,7 +40,7 @@ export async function fetchTrendingArticles(): Promise<Article[]> {
 }
 
 export async function fetchArticleBySlug(slug: string): Promise<Article | null> {
-  const res = await newsFetch(`/api/articles/${slug}`);
+  const res = await newsFetch(`/api/articles/${slug}`, 600);
   if (!res.ok) return null;
   const json = (await res.json()) as { success: boolean; data: Article };
   return json.success ? json.data : null;
@@ -54,7 +54,7 @@ export interface Category {
 
 export async function fetchCategories(): Promise<Category[]> {
   try {
-    const res = await newsFetch("/api/categories");
+    const res = await newsFetch("/api/categories", 3600);
     if (!res.ok) return [];
     const json = (await res.json()) as { success: boolean; data: Category[] };
     return json.success ? json.data : [];
@@ -70,7 +70,7 @@ export async function fetchArticlesByCategory(
   try {
     const params = new URLSearchParams({ limit: String(limit) });
     if (category) params.set("category", category);
-    const res = await newsFetch(`/api/articles?${params}`);
+    const res = await newsFetch(`/api/articles?${params}`, 300);
     if (!res.ok) return [];
     const json = (await res.json()) as { success: boolean; data: Article[] };
     return json.success ? json.data : [];
@@ -88,10 +88,21 @@ export async function fetchArticlesBySearch(
     const params = new URLSearchParams({ limit: String(limit) });
     if (query) params.set("search", query);
     if (category) params.set("category", category);
-    const res = await newsFetch(`/api/articles?${params}`);
+    const res = await newsFetch(`/api/articles?${params}`, 60);
     if (!res.ok) return [];
     const json = (await res.json()) as { success: boolean; data: Article[] };
     return json.success ? json.data : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchAllArticleSlugs(): Promise<string[]> {
+  try {
+    const res = await newsFetch("/api/articles?limit=500", 3600);
+    if (!res.ok) return [];
+    const json = (await res.json()) as { success: boolean; data: Article[] };
+    return json.success ? json.data.map((a) => a.slug) : [];
   } catch {
     return [];
   }
