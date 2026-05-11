@@ -1,11 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { subscribeCookie } from "@/lib/subscription";
 
 export function SubscribeButton() {
+  const router = useRouter();
+
   function handleSubscribe() {
     subscribeCookie();
-    window.location.reload();
+    router.refresh();
   }
 
   return (
