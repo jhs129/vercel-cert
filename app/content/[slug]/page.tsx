@@ -4,10 +4,18 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
-import { fetchArticleBySlug, fetchTrendingArticles, type Article } from "@/lib/articles-api";
+import { fetchArticleBySlug, fetchAllArticleSlugs, fetchTrendingArticles, type Article } from "@/lib/articles-api";
 import { isSubscribedServer } from "@/lib/subscription.server";
 import { PaywallBanner } from "@/components/ui/PaywallBanner";
 import { TrendingArticles } from "@/components/ui/TrendingArticles";
+
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const slugs = await fetchAllArticleSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";
