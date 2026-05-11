@@ -1,7 +1,20 @@
+import type { Metadata } from "next";
 import HeroBanner from "@/components/ui/HeroBanner";
 import CardImage from "@/components/ui/CardImage";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
 import { fetchTrendingArticles } from "@/lib/articles-api";
+
+export const metadata: Metadata = {
+  title: "Home",
+  description: "The latest news and trending articles.",
+  openGraph: {
+    title: "Home",
+    description: "The latest news and trending articles.",
+    siteName: "Vercel News Site",
+    url: "/",
+    images: [{ url: "/og-image.png" }],
+  },
+};
 
 export default async function HomePage() {
   const articles = await fetchTrendingArticles();

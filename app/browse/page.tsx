@@ -5,6 +5,13 @@ import CategoryBrowseClient from "@/components/ui/CategoryBrowse/CategoryBrowseC
 export const metadata: Metadata = {
   title: "Browse Articles",
   description: "Browse and filter articles by category.",
+  openGraph: {
+    title: "Browse Articles",
+    description: "Browse and filter articles by category.",
+    siteName: "Vercel News Site",
+    url: "/browse",
+    images: [{ url: "/og-image.png" }],
+  },
 };
 
 export default function BrowsePage() {

@@ -4,9 +4,10 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
-import { fetchArticleBySlug, type Article } from "@/lib/articles-api";
+import { fetchArticleBySlug, fetchTrendingArticles, type Article } from "@/lib/articles-api";
 import { isSubscribedServer } from "@/lib/subscription.server";
 import { PaywallBanner } from "@/components/ui/PaywallBanner";
+import { TrendingArticles } from "@/components/ui/TrendingArticles";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";
@@ -37,6 +38,7 @@ function parseInline(text: string): ReactNode[] {
     return seg;
   });
 }
+
 
 export async function generateMetadata({
   params,
@@ -73,10 +75,15 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [article, isSubscribed] = await Promise.all([
+  const [article, isSubscribed, trendingRaw] = await Promise.all([
     fetchArticle(slug),
     isSubscribedServer(),
+    fetchTrendingArticles(),
   ]);
+
+  const trendingArticles = trendingRaw
+    .filter((a) => a.slug !== slug)
+    .slice(0, 3);
   if (!article) notFound();
 
   const { author = { name: "", avatar: "" }, publishedAt = "", tags = [], content = [] } = article;
@@ -186,6 +193,10 @@ export default async function ArticlePage({
         </div>
       ) : (
         <PaywallBanner teaser={teaser ?? ""} />
+      )}
+
+      {trendingArticles.length > 0 && (
+        <TrendingArticles articles={trendingArticles} />
       )}
     </article>
   );
