@@ -26,21 +26,13 @@ export function SubscriptionIndicatorClient({ initialSubscribed }: SubscriptionI
 
   if (subscribed) {
     return (
-      <div className="flex items-center gap-3">
-        <span
-          className="text-sm font-medium text-accent"
-          aria-label="You are subscribed to Vercel Daily"
-        >
-          Subscribed
-        </span>
-        <button
-          onClick={handleUnsubscribe}
-          className="text-xs text-foreground underline hover:opacity-70 transition-opacity"
-          aria-label="Unsubscribe from Vercel Daily"
-        >
-          Unsubscribe
-        </button>
-      </div>
+      <button
+        onClick={handleUnsubscribe}
+        className="text-xs text-foreground underline hover:opacity-70 transition-opacity"
+        aria-label="Unsubscribe from Vercel Daily"
+      >
+        Unsubscribe
+      </button>
     );
   }
 
