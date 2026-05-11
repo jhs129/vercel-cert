@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 export type AlertVariant = "breaking" | "warning" | "info";
@@ -7,6 +8,7 @@ export interface AlertProps {
   variant?: AlertVariant;
   label?: string;
   message: string;
+  href?: string;
   action?: ReactNode;
 }
 
@@ -31,7 +33,7 @@ const variantStyles: Record<
   },
 };
 
-export function Alert({ variant = "breaking", label, message, action }: AlertProps) {
+export function Alert({ variant = "breaking", label, message, href, action }: AlertProps) {
   const { iconSrc, iconFilter, badgeBorder } = variantStyles[variant];
 
   return (
@@ -56,6 +58,14 @@ export function Alert({ variant = "breaking", label, message, action }: AlertPro
         </span>
       )}
       <span className="text-sm">{message}</span>
+      {href && (
+        <Link
+          href={href}
+          className="text-sm font-semibold underline underline-offset-2 shrink-0 hover:opacity-80"
+        >
+          Read more
+        </Link>
+      )}
       {action}
     </div>
   );

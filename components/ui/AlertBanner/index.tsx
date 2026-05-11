@@ -1,39 +1,34 @@
-import { headers } from "next/headers";
-import { fetchEntries } from "@builder.io/sdk-react";
 import { AlertBannerClient } from "./AlertBannerClient";
-import type { CmsAlert } from "@/lib/cms-models";
-import { BUILDER_API_KEY, safeFetch } from "@/lib/builder";
+
+export interface BreakingNewsItem {
+  id: string;
+  headline: string;
+  summary: string;
+  articleId: string;
+  category: string;
+  publishedAt: string;
+  urgent: boolean;
+}
 
 export async function AlertBanner() {
-  if (!BUILDER_API_KEY) return null;
+  const apiBase = process.env.API_BASE;
+  const bypassToken = process.env.API_BYPASS_TOKEN;
 
-  const headersList = await headers();
-  const urlPath = headersList.get("x-pathname") ?? "/";
+  if (!apiBase) return null;
 
-  let entries: Awaited<ReturnType<typeof fetchEntries>> = [];
   try {
-    entries = await fetchEntries({
-      model: "alert",
-      apiKey: BUILDER_API_KEY,
-      userAttributes: { urlPath },
-      fetch: safeFetch,
+    const res = await fetch(`${apiBase}/api/breaking-news`, {
+      headers: bypassToken ? { "x-vercel-protection-bypass": bypassToken } : {},
+      next: { revalidate: 300 },
     });
+
+    if (!res.ok) return null;
+
+    const json = await res.json();
+    if (!json.success || !json.data) return null;
+
+    return <AlertBannerClient item={json.data as BreakingNewsItem} />;
   } catch {
     return null;
   }
-
-  if (!entries.length) return null;
-
-  const alerts: CmsAlert[] = entries.map((entry) => ({
-    id: entry.id ?? "",
-    name: (entry.name as string) ?? "",
-    published: (entry.published as string) ?? "",
-    data: {
-      variant: entry.data?.variant as string | undefined,
-      label: (entry.data?.label as string) ?? "",
-      message: (entry.data?.message as string) ?? "",
-    },
-  }));
-
-  return <AlertBannerClient alerts={alerts} />;
 }
