@@ -47,47 +47,50 @@ Each `start-dev` ticket creates a worktree at `../<branch-name>` relative to the
 
 ## Architecture
 
-This is a Next.js 16 App Router application using Builder.io as the primary CMS.
+This is a Next.js 16 App Router application. Content is served by an external news API — there is no headless CMS powering page routing. 
 
-### Builder.io Integration
+### Data Layer
 
-All CMS content flows through `@builder.io/sdk-react` — the App Router-native SDK. **Do not use `@builder.io/react`** — it is the Page Router SDK and is incompatible with React 19 + Turbopack (causes a `createContext is not a function` crash at module evaluation).
-
-Two Builder.io models are in use:
-
-- **`page`** — drives the catch-all route. Every URL not claimed by a static Next.js route is fetched from this model and rendered via `<Content>`.
-- **`alert`** — URL-targeted alert banners fetched on every page and rendered just below the header via the `AlertBanner` component.
-
-Required environment variables:
-- `NEXT_PUBLIC_BUILDER_API_KEY` — Builder.io public API key (required; all pages return 404 without it)
-- `NEXT_PUBLIC_SITE_URL` — canonical base URL (e.g. `https://example.com`); if unset, canonical URLs and `og:url` tags are omitted from all pages
-
-#### Fetch pattern
-
-Use `fetchOneEntry` (single) or `fetchEntries` (multiple) from `@builder.io/sdk-react`. Always pass a `safeFetch` wrapper to suppress the SDK's internal `console.error` on non-OK responses:
+All article content flows through `lib/articles-api.ts`, which fetches from the external news API:
 
 ```ts
-const safeFetch = async (input: string, init?: object) => {
-  const res = await fetch(input, init as RequestInit);
-  if (!res.ok) return new Response(JSON.stringify({ results: [] }), { status: 200 });
-  return res;
-};
+const API_BASE = process.env.API_BASE ?? "https://vercel-daily-news-api.vercel.app";
 ```
 
-Pass `getBuilderSearchParams(searchParams)` as `options` and `isPreviewing(searchParams)` to gate `includeUnpublished` — both are exported from `@builder.io/sdk-react`.
+Key functions and their endpoints:
 
-#### Rendering
+| Function | Endpoint |
+|----------|----------|
+| `fetchTrendingArticles()` | `GET /api/articles/trending` |
+| `fetchArticleBySlug(slug)` | `GET /api/articles/:slug` |
+| `fetchCategories()` | `GET /api/categories` |
+| `fetchArticlesByCategory(category?, limit?)` | `GET /api/articles?category=&limit=` |
+| `fetchArticlesBySearch(query, category?, limit?)` | `GET /api/articles?search=&category=&limit=` |
 
-The `<Content>` component from `@builder.io/sdk-react` must be used in a `"use client"` component. Always pass `canTrack={false}` to prevent a React 19 hydration mismatch caused by the SDK's A/B variant initialization script.
+All fetches use `next: { revalidate: 60 }` for ISR. The `API_BYPASS_TOKEN` env var is injected as `x-vercel-protection-bypass` when set (for Vercel deployment protection).
+
+Required environment variables:
+- `API_BASE` — override the news API base URL (defaults to `https://vercel-daily-news-api.vercel.app`)
+- `API_BYPASS_TOKEN` — Vercel deployment protection bypass token (optional)
+- `NEXT_PUBLIC_SITE_URL` — canonical base URL; if unset, `og:url` tags are omitted
+- `NEXT_PUBLIC_GTM_ID` — Google Tag Manager container ID (optional)
+
+### AlertBanner
+
+`components/ui/AlertBanner/` fetches breaking news from the external API (`GET /api/breaking-news`) and renders an alert banner if an active item exists:
+- `index.tsx` — async server component. Fetches from `${API_BASE}/api/breaking-news`, returns `null` if `API_BASE` is unset or the response is empty.
+- `AlertBannerClient.tsx` — `"use client"`. Renders the breaking news item. No CMS knowledge.
 
 ### Routing
 
-- `proxy.ts` — runs on every request and sets an `x-pathname` header so server components can read the current URL path (used by `AlertBanner` for targeting).
-- `app/[[...page]]/page.tsx` — async server component catch-all. Computes `urlPath`, fetches the Builder.io `page` model, calls `notFound()` when no content and not previewing.
-- `app/[[...page]]/BuilderPageClient.tsx` — `"use client"` wrapper that renders `<Content>` and checks `isPreviewing()` client-side for visual editor support.
-- `app/not-found.tsx` — custom 404 rendered by `notFound()`.
+- `middleware.ts` (exported from `proxy.ts`) — runs on every request and sets an `x-pathname` header.
+- `app/page.tsx` — home page. Fetches trending articles, renders `HeroBanner` + `CardImage` grid.
+- `app/browse/page.tsx` — browse all articles by category.
+- `app/content/[slug]/page.tsx` — article detail page.
+- `app/search/page.tsx` + `SearchPageClient.tsx` — search page (server/client split).
+- `app/not-found.tsx` — custom 404.
 
-Static Next.js routes (e.g. `/products/[slug]`) always take precedence over the catch-all.
+There is no catch-all route; all content URLs are static Next.js routes backed by the external API.
 
 ### Server / Client Split Pattern
 
@@ -96,14 +99,6 @@ Page-level files follow a consistent pattern:
 - `app/*/[Feature]Client.tsx` — Client component (`"use client"`). Owns all interactivity.
 
 Components with sub-components or helpers exceeding ~100 lines are split into a directory: `components/[Name]/index.tsx` (primary component + Props interface) plus co-located files.
-
-### AlertBanner Component
-
-`components/ui/AlertBanner/` is the reference example of the CMS + server/client split:
-- `index.tsx` — async server component. Reads `x-pathname` from headers, calls `fetchEntries` for the `alert` model with `userAttributes: { urlPath }`, shapes the data, passes `AlertItem[]` to the client.
-- `AlertBannerClient.tsx` — `"use client"`. Renders `<Alert>` for each item. Has no knowledge of Builder.io.
-
-This decoupling means the CMS can be swapped by only touching `index.tsx`.
 
 ### Styling
 
@@ -119,7 +114,7 @@ Always use `@apply` with Tailwind classes for all styles in `globals.css`. Never
 
 ### Themeable Interface
 
-Any component that supports theming must implement the `Themeable` interface from `lib/types.ts` and use the shared `themeInput` from `lib/builder-inputs.ts` when registering with Builder.io.
+Any component that supports theming must implement the `Themeable` interface from `lib/types.ts`:
 
 ```ts
 // lib/types.ts
@@ -149,23 +144,6 @@ export default function MyComponent({ title, theme = "light" }: MyComponentProps
     </div>
   );
 }
-```
-
-When registering the component with Builder.io, spread `themeInput` into the `inputs` array:
-
-```ts
-// components/ui/MyComponent/MyComponent.builder.ts
-import { Builder } from "@builder.io/sdk-react";
-import { themeInput } from "@/lib/builder-inputs";
-import MyComponent from ".";
-
-Builder.registerComponent(MyComponent, {
-  name: "MyComponent",
-  inputs: [
-    { name: "title", type: "string", defaultValue: "Hello" },
-    themeInput,
-  ],
-});
 ```
 
 The `theme-dark` and `theme-light` CSS classes are defined in `app/globals.css`. To add a new theme, add the class there and add the value to the `Theme` union in `lib/types.ts`.
