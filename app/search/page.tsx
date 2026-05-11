@@ -5,6 +5,10 @@ import SearchPageClient from "./SearchPageClient";
 export const metadata: Metadata = {
   title: "Search Articles",
   description: "Search our article library",
+  openGraph: {
+    title: "Search Articles",
+    description: "Search our article library",
+  },
 };
 
 interface SearchPageProps {

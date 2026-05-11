@@ -5,6 +5,10 @@ import CategoryBrowseClient from "@/components/ui/CategoryBrowse/CategoryBrowseC
 export const metadata: Metadata = {
   title: "Browse Articles",
   description: "Browse and filter articles by category.",
+  openGraph: {
+    title: "Browse Articles",
+    description: "Browse and filter articles by category.",
+  },
 };
 
 export default function BrowsePage() {
