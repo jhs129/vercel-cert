@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       { protocol: "https", hostname: "placehold.co" },
-      { protocol: "https", hostname: "cdn.builder.io" },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },
