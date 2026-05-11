@@ -1,12 +1,8 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { NavLink } from "@/lib/types";
-
-const DEFAULT_LINKS: NavLink[] = [
-  { href: "/terms", label: "Terms of Service" },
-  { href: "/privacy", label: "Privacy Policy" },
-];
+import { LEGAL_NAV_LINKS } from "@/lib/legal-nav";
+import type { NavLink } from "@/lib/types";
 
 interface FooterProps {
   logo?: string;
@@ -17,7 +13,7 @@ interface FooterProps {
 
 export function Footer({
   logo = "/logo-white.png",
-  links = DEFAULT_LINKS,
+  links = LEGAL_NAV_LINKS,
   copyrightText = "All rights reserved.",
   className = "",
 }: FooterProps) {
