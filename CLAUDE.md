@@ -75,17 +75,15 @@ Required environment variables:
 - `NEXT_PUBLIC_SITE_URL` — canonical base URL; if unset, `og:url` tags are omitted
 - `NEXT_PUBLIC_GTM_ID` — Google Tag Manager container ID (optional)
 
-### AlertBanner (Partial Builder.io Remnant)
+### AlertBanner
 
-`components/ui/AlertBanner/` still uses Builder.io to fetch CMS-managed alert banners. This is the only remaining Builder.io integration:
-- `index.tsx` — async server component. Reads `x-pathname` from headers, calls Builder.io `alert` model, passes `AlertItem[]` to the client. Returns `null` if `NEXT_PUBLIC_BUILDER_API_KEY` is unset.
-- `AlertBannerClient.tsx` — `"use client"`. Renders `<Alert>` for each item. No CMS knowledge.
-
-`NEXT_PUBLIC_BUILDER_API_KEY` is required only for this component. The rest of the application functions without it.
+`components/ui/AlertBanner/` fetches breaking news from the external API (`GET /api/breaking-news`) and renders an alert banner if an active item exists:
+- `index.tsx` — async server component. Fetches from `${API_BASE}/api/breaking-news`, returns `null` if `API_BASE` is unset or the response is empty.
+- `AlertBannerClient.tsx` — `"use client"`. Renders the breaking news item. No CMS knowledge.
 
 ### Routing
 
-- `middleware.ts` (exported from `proxy.ts`) — runs on every request and sets an `x-pathname` header so server components can read the current URL path (used by `AlertBanner` for targeting).
+- `middleware.ts` (exported from `proxy.ts`) — runs on every request and sets an `x-pathname` header.
 - `app/page.tsx` — home page. Fetches trending articles, renders `HeroBanner` + `CardImage` grid.
 - `app/browse/page.tsx` — browse all articles by category.
 - `app/content/[slug]/page.tsx` — article detail page.
