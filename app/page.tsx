@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { cacheLife, cacheTag } from "next/cache";
+import { cacheProfiles } from "@/lib/cache-profiles";
 import HeroBanner from "@/components/ui/HeroBanner";
 import CardImage from "@/components/ui/CardImage";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
@@ -16,7 +18,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function HomePage() {
+async function CachedHomeContent() {
+  "use cache";
+  cacheLife(cacheProfiles.short);
+  cacheTag("trending");
+
   const articles = await fetchTrendingArticles();
 
   const articlesWithBlur = await Promise.all(
@@ -63,4 +69,8 @@ export default async function HomePage() {
       )}
     </>
   );
+}
+
+export default function HomePage() {
+  return <CachedHomeContent />;
 }

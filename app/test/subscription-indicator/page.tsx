@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SubscriptionIndicator } from "@/components/ui/SubscriptionIndicator";
 
 export default function SubscriptionIndicatorTestPage() {
@@ -9,7 +10,9 @@ export default function SubscriptionIndicatorTestPage() {
       </p>
       <div className="flex items-center gap-4 p-4 border rounded-lg">
         <span className="text-sm text-muted">In header context:</span>
-        <SubscriptionIndicator />
+        <Suspense fallback={null}>
+          <SubscriptionIndicator />
+        </Suspense>
       </div>
     </main>
   );

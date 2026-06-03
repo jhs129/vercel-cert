@@ -16,19 +16,23 @@ export async function AlertBanner() {
 
   if (!apiBase) return null;
 
+  let item: BreakingNewsItem | null = null;
   try {
     const res = await fetch(`${apiBase}/api/breaking-news`, {
       headers: bypassToken ? { "x-vercel-protection-bypass": bypassToken } : {},
       next: { revalidate: 300 },
     });
 
-    if (!res.ok) return null;
-
-    const json = await res.json();
-    if (!json.success || !json.data) return null;
-
-    return <AlertBannerClient item={json.data as BreakingNewsItem} />;
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        item = json.data as BreakingNewsItem;
+      }
+    }
   } catch {
     return null;
   }
+
+  if (!item) return null;
+  return <AlertBannerClient item={item} />;
 }

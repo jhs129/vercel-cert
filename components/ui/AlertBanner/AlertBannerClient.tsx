@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { DismissButton } from "@/components/ui/Alert/DismissButton";
 import type { AlertVariant } from "@/components/ui/Alert";
@@ -22,11 +22,7 @@ function setDismissCookie(id: string) {
 }
 
 export function AlertBannerClient({ item }: AlertBannerClientProps) {
-  const [dismissed, setDismissed] = useState(false);
-
-  useEffect(() => {
-    setDismissed(isDismissed(item.id));
-  }, [item.id]);
+  const [dismissed, setDismissed] = useState(() => isDismissed(item.id));
 
   if (dismissed) return null;
 
