@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { cacheLife, cacheTag } from "next/cache";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
-import { fetchArticleBySlug, fetchTrendingArticles, type Article } from "@/lib/articles-api";
+import { fetchArticleBySlug, fetchTrendingArticles } from "@/lib/articles-api";
 import { isSubscribedServer } from "@/lib/subscription.server";
 import { PaywallBanner } from "@/components/ui/PaywallBanner";
 import { TrendingArticles } from "@/components/ui/TrendingArticles";
