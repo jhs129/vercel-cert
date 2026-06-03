@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
+import { cacheProfiles } from "@/lib/cache-profiles";
 import { fetchArticlesByCategory, fetchCategories } from "@/lib/articles-api";
 import BrowseShell from "@/components/ui/CategoryBrowse/BrowseShell";
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 
 async function CachedBrowseContent({ category }: { category?: string }) {
   "use cache";
-  cacheLife("minutes");
+  cacheLife(cacheProfiles.short);
   cacheTag("articles", "categories");
 
   const [articles, categoryList] = await Promise.all([

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { cacheLife, cacheTag } from "next/cache";
+import { cacheProfiles } from "@/lib/cache-profiles";
 import { fetchArticlesByCategory, fetchCategories } from "@/lib/articles-api";
 import BrowseShell from "./BrowseShell";
 import type { Themeable } from "@/lib/types";
@@ -15,7 +16,7 @@ export default async function CategoryBrowse({
   activeCategory,
 }: CategoryBrowseProps) {
   "use cache";
-  cacheLife("minutes");
+  cacheLife(cacheProfiles.short);
   cacheTag("articles", "categories");
 
   const [articles, categoryList] = await Promise.all([

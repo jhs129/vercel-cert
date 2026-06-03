@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { cacheProfiles } from "@/lib/cache-profiles";
 
 const API_BASE = process.env.API_BASE ?? "https://vercel-daily-news-api.vercel.app";
 
@@ -31,7 +32,7 @@ async function newsFetch(path: string): Promise<Response> {
 
 export async function fetchTrendingArticles(): Promise<Article[]> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife(cacheProfiles.short);
   cacheTag("trending");
   try {
     const res = await newsFetch("/api/articles/trending");
@@ -45,7 +46,7 @@ export async function fetchTrendingArticles(): Promise<Article[]> {
 
 export async function fetchArticleBySlug(slug: string): Promise<Article | null> {
   "use cache";
-  cacheLife("hours");
+  cacheLife(cacheProfiles.medium);
   cacheTag("articles", `article-${slug}`);
   const res = await newsFetch(`/api/articles/${slug}`);
   if (!res.ok) return null;
@@ -61,7 +62,7 @@ export interface Category {
 
 export async function fetchCategories(): Promise<Category[]> {
   "use cache";
-  cacheLife("days");
+  cacheLife(cacheProfiles.long);
   cacheTag("categories");
   try {
     const res = await newsFetch("/api/categories");
@@ -78,7 +79,7 @@ export async function fetchArticlesByCategory(
   limit = 100
 ): Promise<Article[]> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife(cacheProfiles.short);
   cacheTag("articles", category ? `category-${category}` : "all-articles");
   try {
     const params = new URLSearchParams({ limit: String(limit) });
@@ -98,7 +99,7 @@ export async function fetchArticlesBySearch(
   limit = 20
 ): Promise<Article[]> {
   "use cache";
-  cacheLife({ stale: 60, revalidate: 120, expire: 300 });
+  cacheLife(cacheProfiles.search);
   cacheTag("search");
   try {
     const params = new URLSearchParams({ limit: String(limit) });
@@ -115,7 +116,7 @@ export async function fetchArticlesBySearch(
 
 export async function fetchAllArticleSlugs(): Promise<string[]> {
   "use cache";
-  cacheLife("days");
+  cacheLife(cacheProfiles.long);
   cacheTag("slugs");
   try {
     const res = await newsFetch("/api/articles?limit=500");

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cacheLife } from "next/cache";
+import { cacheProfiles } from "@/lib/cache-profiles";
 import { LEGAL_NAV_LINKS } from "@/lib/legal-nav";
 import type { NavLink } from "@/lib/types";
 
@@ -18,7 +19,7 @@ export async function Footer({
   className = "",
 }: FooterProps) {
   "use cache";
-  cacheLife("days");
+  cacheLife(cacheProfiles.long);
   const year = new Date().getFullYear();
 
   return (

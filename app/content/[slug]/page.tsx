@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { cacheLife, cacheTag } from "next/cache";
+import { cacheProfiles } from "@/lib/cache-profiles";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
 import { fetchArticleBySlug, fetchTrendingArticles } from "@/lib/articles-api";
 import { isSubscribedServer } from "@/lib/subscription.server";
@@ -67,7 +68,7 @@ export async function generateMetadata({
 
 async function ArticleHeader({ slug }: { slug: string }) {
   "use cache";
-  cacheLife("hours");
+  cacheLife(cacheProfiles.medium);
   cacheTag("articles", `article-${slug}`);
 
   const article = await fetchArticleBySlug(slug);
@@ -196,7 +197,7 @@ async function ArticleBodyGate({ slug }: { slug: string }) {
 
 async function CachedTrending({ slug }: { slug: string }) {
   "use cache";
-  cacheLife("minutes");
+  cacheLife(cacheProfiles.short);
   cacheTag("trending");
 
   const trendingRaw = await fetchTrendingArticles();
