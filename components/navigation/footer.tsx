@@ -1,6 +1,6 @@
-"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { cacheLife } from "next/cache";
 import { LEGAL_NAV_LINKS } from "@/lib/legal-nav";
 import type { NavLink } from "@/lib/types";
 
@@ -11,12 +11,14 @@ interface FooterProps {
   className?: string;
 }
 
-export function Footer({
+export async function Footer({
   logo = "/logo-white.png",
   links = LEGAL_NAV_LINKS,
   copyrightText = "All rights reserved.",
   className = "",
 }: FooterProps) {
+  "use cache";
+  cacheLife("days");
   const year = new Date().getFullYear();
 
   return (

@@ -1,28 +1,17 @@
-import { cache } from "react";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Image from "next/image";
+import { cacheLife, cacheTag } from "next/cache";
 import { generateBlurPlaceholder } from "@/lib/image-utils";
-import { fetchArticleBySlug, fetchAllArticleSlugs, fetchTrendingArticles, type Article } from "@/lib/articles-api";
+import { fetchArticleBySlug, fetchTrendingArticles, type Article } from "@/lib/articles-api";
 import { isSubscribedServer } from "@/lib/subscription.server";
 import { PaywallBanner } from "@/components/ui/PaywallBanner";
 import { TrendingArticles } from "@/components/ui/TrendingArticles";
 
-export const dynamic = "force-dynamic";
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  const slugs = await fetchAllArticleSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
-
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const SITE_NAME = "Vercel News Site";
-
-const fetchArticle = cache(async (slug: string): Promise<Article | null> => {
-  return fetchArticleBySlug(slug);
-});
 
 function parseInline(text: string): ReactNode[] {
   return text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g).map((seg, i) => {
@@ -47,14 +36,13 @@ function parseInline(text: string): ReactNode[] {
   });
 }
 
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = await fetchArticle(slug);
+  const article = await fetchArticleBySlug(slug);
   if (!article) return { title: "Not Found", robots: { index: false, follow: false } };
   const canonicalUrl = SITE_URL ? `${SITE_URL.replace(/\/$/, "")}/content/${slug}` : undefined;
   return {
@@ -77,24 +65,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function ArticlePage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const [article, isSubscribed, trendingRaw] = await Promise.all([
-    fetchArticle(slug),
-    isSubscribedServer(),
-    fetchTrendingArticles(),
-  ]);
+async function ArticleHeader({ slug }: { slug: string }) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("articles", `article-${slug}`);
 
-  const trendingArticles = trendingRaw
-    .filter((a) => a.slug !== slug)
-    .slice(0, 3);
-  if (!article) notFound();
+  const article = await fetchArticleBySlug(slug);
+  if (!article) return null;
 
-  const { author = { name: "", avatar: "" }, publishedAt = "", tags = [], content = [] } = article;
+  const { author = { name: "", avatar: "" }, publishedAt = "", tags = [] } = article;
 
   const formattedDate = publishedAt
     ? new Date(publishedAt).toLocaleDateString("en-US", {
@@ -114,12 +93,8 @@ export default async function ArticlePage({
 
   const heroBlur = article.image ? await generateBlurPlaceholder(article.image) : undefined;
 
-  const teaser =
-    content.find((b) => b.type === "paragraph" && b.text)?.text ??
-    article.excerpt;
-
   return (
-    <article className="py-8">
+    <>
       {article.image && (
         <div className="relative w-full h-48 md:h-64 lg:h-72 mb-8 overflow-hidden rounded-lg">
           <Image
@@ -176,36 +151,90 @@ export default async function ArticlePage({
           </div>
         )}
       </header>
+    </>
+  );
+}
 
-      {isSubscribed ? (
-        <div className="prose max-w-none space-y-4">
-          {content.map((block, i) => {
-            if (block.type === "paragraph" && block.text) {
-              return (
-                <p key={i} className="text-foreground leading-relaxed">
-                  {parseInline(block.text)}
-                </p>
-              );
-            }
-            if (block.type === "unordered-list" && block.items) {
-              return (
-                <ul key={i} className="list-disc list-inside space-y-2 text-foreground">
-                  {block.items.map((item, j) => (
-                    <li key={j}>{parseInline(item)}</li>
-                  ))}
-                </ul>
-              );
-            }
-            return null;
-          })}
-        </div>
-      ) : (
-        <PaywallBanner teaser={teaser ?? ""} />
-      )}
+async function ArticleBodyGate({ slug }: { slug: string }) {
+  const article = await fetchArticleBySlug(slug);
+  if (!article) return null;
 
-      {trendingArticles.length > 0 && (
-        <TrendingArticles articles={trendingArticles} />
-      )}
+  const isSubscribed = await isSubscribedServer();
+
+  const { content = [] } = article;
+  const teaser =
+    content.find((b) => b.type === "paragraph" && b.text)?.text ?? article.excerpt;
+
+  if (!isSubscribed) {
+    return <PaywallBanner teaser={teaser ?? ""} />;
+  }
+
+  return (
+    <div className="prose max-w-none space-y-4">
+      {content.map((block, i) => {
+        if (block.type === "paragraph" && block.text) {
+          return (
+            <p key={i} className="text-foreground leading-relaxed">
+              {parseInline(block.text)}
+            </p>
+          );
+        }
+        if (block.type === "unordered-list" && block.items) {
+          return (
+            <ul key={i} className="list-disc list-inside space-y-2 text-foreground">
+              {block.items.map((item, j) => (
+                <li key={j}>{parseInline(item)}</li>
+              ))}
+            </ul>
+          );
+        }
+        return null;
+      })}
+    </div>
+  );
+}
+
+async function CachedTrending({ slug }: { slug: string }) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("trending");
+
+  const trendingRaw = await fetchTrendingArticles();
+  const articles = trendingRaw.filter((a) => a.slug !== slug).slice(0, 3);
+
+  if (articles.length === 0) return null;
+  return <TrendingArticles articles={articles} />;
+}
+
+function ArticleBodySkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse">
+      <div className="h-4 bg-border rounded w-full" />
+      <div className="h-4 bg-border rounded w-5/6" />
+      <div className="h-4 bg-border rounded w-4/6" />
+    </div>
+  );
+}
+
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+
+  const article = await fetchArticleBySlug(slug);
+  if (!article) notFound();
+
+  return (
+    <article className="py-8">
+      <ArticleHeader slug={slug} />
+
+      <Suspense fallback={<ArticleBodySkeleton />}>
+        <ArticleBodyGate slug={slug} />
+      </Suspense>
+
+      <CachedTrending slug={slug} />
     </article>
   );
 }

@@ -1,5 +1,6 @@
 import "server-only";
 import { getPlaiceholder } from "plaiceholder";
+import { cacheLife, cacheTag } from "next/cache";
 
 const ALLOWED_BLUR_HOSTNAMES = new Set(["placehold.co"]);
 const ALLOWED_BLUR_HOSTNAME_SUFFIXES = [".public.blob.vercel-storage.com"];
@@ -10,6 +11,9 @@ export function generateColorPlaceholder(r: number, g: number, b: number): strin
 }
 
 export async function generateBlurPlaceholder(url: string): Promise<string> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("blur-placeholder");
   try {
     const parsed = new URL(url);
     const allowed =

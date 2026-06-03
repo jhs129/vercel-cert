@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { fetchTrendingArticles, fetchCategories } from "@/lib/articles-api";
 import SearchPageClient from "./SearchPageClient";
@@ -18,7 +19,7 @@ interface SearchPageProps {
   searchParams: Promise<{ q?: string; category?: string; delay?: string }>;
 }
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
+async function SearchPageContent({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const initialQuery = params.q?.trim() ?? "";
   const initialCategory = params.category ?? null;
@@ -38,5 +39,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       categories={categories}
       simulateDelay={simulateDelay}
     />
+  );
+}
+
+export default function SearchPage(props: SearchPageProps) {
+  return (
+    <Suspense>
+      <SearchPageContent {...props} />
+    </Suspense>
   );
 }
