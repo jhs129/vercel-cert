@@ -36,6 +36,7 @@ async function CachedBrowseContent({ category }: { category?: string }) {
 
   return (
     <BrowseShell
+      key={category ?? "all"}
       title="Browse our Articles"
       articles={articles}
       categories={categories}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { Article } from "@/lib/articles-api";
 import CategoryFilter from "@/components/ui/CategoryFilter";
@@ -28,6 +28,7 @@ export default function BrowseShell({
   const router = useRouter();
   const pathname = usePathname();
   const [page, setPage] = useState(1);
+  const [isPending, startTransition] = useTransition();
 
   const handleCategoryChange = (cat: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -37,7 +38,9 @@ export default function BrowseShell({
       params.delete("category");
     }
     const qs = params.toString();
-    router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
+    startTransition(() => {
+      router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
+    });
   };
 
   const totalPages = Math.ceil(articles.length / PAGE_SIZE);
@@ -55,29 +58,31 @@ export default function BrowseShell({
         />
       )}
 
-      {paged.length === 0 ? (
-        <SearchEmptyState
-          query={activeCategory ?? ""}
-          onClearSearch={() => handleCategoryChange(null)}
-        />
-      ) : (
-        <div className="flex flex-col gap-4">
-          {paged.map((article) => (
-            <ArticleHit
-              key={article.id}
-              title={article.title}
-              slug={article.slug}
-              publishDate={
-                article.publishedAt
-                  ? new Date(article.publishedAt).getTime()
-                  : undefined
-              }
-              description={article.excerpt}
-              categories={article.category ? [article.category] : undefined}
-            />
-          ))}
-        </div>
-      )}
+      <div className={isPending ? "opacity-50 pointer-events-none transition-opacity duration-150" : "transition-opacity duration-150"}>
+        {paged.length === 0 ? (
+          <SearchEmptyState
+            query={activeCategory ?? ""}
+            onClearSearch={() => handleCategoryChange(null)}
+          />
+        ) : (
+          <div className="flex flex-col gap-4">
+            {paged.map((article) => (
+              <ArticleHit
+                key={article.id}
+                title={article.title}
+                slug={article.slug}
+                publishDate={
+                  article.publishedAt
+                    ? new Date(article.publishedAt).getTime()
+                    : undefined
+                }
+                description={article.excerpt}
+                categories={article.category ? [article.category] : undefined}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4">
